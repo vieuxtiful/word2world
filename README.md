@@ -439,21 +439,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Word2World** is developed by a multidisciplinary team at the Middlebury Institute of International Studies:
 
-- **Vieux Valcin** - Lead Developer, STAP Architecture
-- **Jinxing Chen** - AI Development, UI/UX Design
-- **Xiaoyue (Cathy) Cao** - AI/Engine Development, Full-Stack
-- **Huiyi (Iris) Zhang** - Proposal Development, Concept Refinement
-- **Yunzhou (Leo) Dai** - Proposal Development, Concept Refinement
-- **Bai Shu** - Research & Documentation
+- **Vieux Valcin** - Lead Developer, Full-Stack
+- **Jinxing Chen** - Development, Frontend (UI/UX Design)
+- **Xiaoyue (Cathy) Cao** - Development, Full-Stack
+- **Huiyi (Iris) Zhang** - Proposal Development, Research & Documentation
+- **Yunzhou (Leo) Dai** - Proposal Development, Research & Documentation
+- **Bai Shu** - Proposal Development, Research & Documentation
 
 ---
 
 ## 📧 Contact
 
-- **Project Website**: [Coming Soon]
-- **Email**: [Your Email]
+- **Project Website**: [TBA]
+- **Email**: [vvalcin@middlebury.edu]
 - **GitHub Issues**: [https://github.com/vieuxtiful/word2world/issues](https://github.com/vieuxtiful/word2world/issues)
-- **Twitter**: [Your Twitter]
+- **X**: [TBC]
 
 ---
 
