@@ -16,7 +16,7 @@ Authors: shu bai, xiaoyue cao, jinxing chen, yunzhou dai, vieux valcin, huiyi zh
 License: MIT
 """
 
-"""# **Word2World Social Media Platform** <br>
+""" **Word2World Social Media Platform**
 **Bridging Ideas Together**
 
 ## STAP v3.0: Topology-Aware Semantic Projection
@@ -63,29 +63,31 @@ This ensures in-platform content recommendations bridge divides without creating
 
 # System Specifications
 Core dependencies
-<br> flask==2.3.0
+flask==2.3.0
 numpy==1.24.0
 scikit-learn==1.3.0
-<br> NLP and embeddings
+
+NLP and embeddings
 sentence-transformers==2.2.2
 transformers==4.30.0
-<br> STAP-specific
+
+STAP-specific
 umap-learn==0.5.4
 pynndescent==0.5.10  # UMAP dependency for fast nearest neighbors
-<br> Database
+
+Database
 sqlalchemy==2.0.0
 psycopg2-binary==2.9.6  # PostgreSQL
 sqlite3  # Built-in
-<br> Testing
+
+Testing
 pytest==7.4.0
 pytest-cov==4.1.0
-<br> Utilities
-python-dotenv==1.0.0
-"""
 
-"""
-STAP v3.0: Full Custom Implementation
-Semantic Topology-Aware Projection - Complete Framework
+Utilities
+python-dotenv==1.0.0"""
+
+""" STAP v3.0: Full Custom Implementation Semantic Topology-Aware Projection - Complete Framework
 
 This implements the complete STAP framework as described in the mathematical whitepaper:
 - Cross-entropy optimization with attractive and repulsive forces
@@ -94,9 +96,7 @@ This implements the complete STAP framework as described in the mathematical whi
 - Stochastic gradient descent with negative sampling
 - HNSW integration for O(log n) nearest neighbor search
 
-Authors: Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang
-Date: October 18, 2025
-"""
+Authors: shu bai, xiaoyue cao, jinxing chen, yunzhou dai, vieux valcin, huiyi zhang"""
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
