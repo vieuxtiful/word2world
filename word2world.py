@@ -1,18 +1,24 @@
+#!/usr/bin/env python3
 """
-World2World - Social Media Platform
+Word2World Social Media Platform - STAP v4.0 + Siamese NN Bridge Optimizer
 Bridging Ideas Together
 
-This platform leverages sophisticated mathematical frameworks and advanced opinion mining capabilities to provide advanced sentiment analysis for
-"bridging" similar ideas of distant or tangential origins.
+This platform implements the STAP v4.0 framework with three major enhancements over the obsolete STAP v3.0:
+1. Multi-Modal (i.e., text, images, and network [e.g., accounts followed]) Mahalanobis Distance (high-dimensional space)
+2. Hyperbolic Geometry with Contrastive Loss (low-dimensional space)
+3. Siamese Neural Network (NN) for Bridge-Aware Scoring
 
 Key Features:
-- Clear separation of concerns with well-defined classes
-- Database abstraction for easy backend switching
-- RESTful API ready for React frontend integration
-- Scalable design that can grow with your platform
-- Comprehensive feedback loop for continuous improvement
+- Multi-modal user profile representation (text + image + network)
+- Covariance-aware distance metrics
+- Hyperbolic semantic space for hierarchical structure
+- Data-driven bridge quality prediction
+- Scalable architecture with Hierarchical Navigable Small World (HNSW) indexing
 
 Authors: shu bai, xiaoyue cao, jinxing chen, yunzhou dai, vieux valcin, huiyi zhang
+Date: October 19, 2025
+Version: 4.0
+
 License: MIT
 """
 
