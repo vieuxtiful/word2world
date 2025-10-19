@@ -1,10 +1,11 @@
-# Word2World - STAP v4.0
-
+# Word2World
 **Bridging Ideas Together**
 
 [![Version](https://img.shields.io/badge/version-4.0-blue.svg)](https://github.com/word2world/stap) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.8+-yellow.svg)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/pytorch-2.0+-red.svg)](https://pytorch.org/) [![Projects for Peace](https://img.shields.io/badge/Projects%20for%20Peace-2025-orange.svg)](https://www.projectsforpeace.org/)
 
-> *A Projects for Peace Initiative*Middlebury Institute of International Studies at Monterey
+> *A Projects for Peace Initiative*
+> Translation, Interpretation, and Localization Management (TILM)
+> Middlebury Institute of International Studies at Monterey
 
 ---
 
@@ -1099,7 +1100,7 @@ If you use STAP v4.0 in your research, please cite:
 
 - **Yunzhou Dai** - [yunzhoud@middlebury.edu](mailto:yunzhoud@middlebury.edu)
 
-- **Huiyi (Iris) Zhang** - [hz3@middlebury.edu](mailto:hz3@middlebury.edu)
+- **Huiyi Zhang** - [hz3@middlebury.edu](mailto:hz3@middlebury.edu)
 
 **Repository:**
 
@@ -1160,6 +1161,5 @@ If you use STAP v4.0 in your research, please cite:
 ---
 
 **Built with ❤️ by the Word2World team**
-
 *Bridging divides, one conversation at a time.*
 
