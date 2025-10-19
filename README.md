@@ -1017,7 +1017,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Jinxing Chen** (Frontend Development) - UI/UX Design, Visual Assets, Demo Production
   - Email: [jinxingc@middlebury.edu](mailto:jinxingc@middlebury.edu)
 
-- **Xiaoyue Cao** (Cathy) (Backend Development) - Repository Organization, Technical Documentation, Demo Production
+- **Xiaoyue Cao** (Backend Development) - Repository Organization, Technical Documentation, Demo Production
   - Email: [xiaoyuec@middlebury.edu](mailto:xiaoyuec@middlebury.edu)
 
 - **Huiyi Zhang** (Project Management) - Impact Research and Content Synthesis
