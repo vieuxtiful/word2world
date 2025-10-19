@@ -1011,22 +1011,22 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Core Team:**
 
-- **Vieux Valcin** (Technical Lead) - AI Development, STAP Framework Architecture, Backend Engineering
+- **Vieux Valcin** (Technical Lead) - AI Development, STAP Framework Architecture, Backend Engineering, Demo Production
   - Email: [vvalcin@miis.edu](mailto:vvalcin@miis.edu)
 
-- **Jinxing Chen** - Visual Assets, Frontend Development, UI/UX Design
+- **Jinxing Chen** (Frontend Development) - UI/UX Design, Visual Assets, Demo Production
   - Email: [jinxingc@middlebury.edu](mailto:jinxingc@middlebury.edu)
 
-- **Xiaoyue Cao** (Cathy) - Repository Organization, Technical Documentation, Demo Production
+- **Xiaoyue Cao** (Cathy) (Backend Development) - Repository Organization, Technical Documentation, Demo Production
   - Email: [xiaoyuec@middlebury.edu](mailto:xiaoyuec@middlebury.edu)
 
-- **Huiyi (Iris) Zhang** - Narrative Development, Social Media Impact Research, Content Strategy
+- **Huiyi Zhang** (Project Management) - Impact Research and Content Synthesis
   - Email: [hz3@middlebury.edu](mailto:hz3@middlebury.edu)
 
-- **Shu Bai** - Mathematical Framework, Algorithm Optimization, Research Synthesis
+- **Shu Bai** (Project Management) - Impact Research and Content Synthesis
   - Email: [sbai@middlebury.edu](mailto:sbai@middlebury.edu)
 
-- **Yunzhou Dai** - Proposal Development, Project Management, Community Engagement
+- **Yunzhou Dai** (Project Management) - Impact Research and Content Synthesis
   - Email: [yunzhoud@middlebury.edu](mailto:yunzhoud@middlebury.edu)
 
 **Institution:**
