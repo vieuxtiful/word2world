@@ -1,4 +1,3 @@
-
 """
 Word2World Social Platform - STAP v4.0
 Bridging Ideas Together
@@ -53,12 +52,6 @@ Environment Variables:
         export HF_TOKEN="your_token_here"
     
     Or in Python:
-        import os
-        os.environ['HF_TOKEN'] = "your_token_here"
-"""
-
-### I screwed around and did not check that hnswlib was installed lmao
-
 import os
 import sys
 import logging
@@ -66,6 +59,9 @@ from typing import List, Dict, Tuple, Optional, Union, Any
 from dataclasses import dataclass
 import numpy as np
 from scipy.linalg import cholesky, solve_triangular
+# Robust covariance estimation
+from robust_covariance import RobustCovarianceEstimator, CovarianceConfig
+
 from sklearn.neighbors import NearestNeighbors
 import hnswlib
 
@@ -105,7 +101,7 @@ def get_hf_token() -> Optional[str]:
     """
     Safely retrieve Hugging Face token from environment variables or Colab secrets.
     This function is secure for GitHub as it never hardcodes tokens.
-    
+
     Returns:
         HF token string or None if not available
     """
@@ -114,10 +110,8 @@ def get_hf_token() -> Optional[str]:
     if token:
         logger.info("HF token loaded from environment variable")
         return token
-    
-    # Try Colab secrets (for Google Colab)
+
     try:
-        from google.colab import userdata
         token = userdata.get('HF_TOKEN')
         logger.info("HF token loaded from Colab secrets")
         return token
@@ -127,7 +121,7 @@ def get_hf_token() -> Optional[str]:
         logger.warning("HF_TOKEN secret not found in Colab")
     except Exception as e:
         logger.warning(f"Error accessing Colab secrets: {e}")
-    
+
     logger.info("No HF token available - using public models only")
     return None
 
@@ -156,6 +150,10 @@ class STAPv4Config:
     use_mahalanobis: bool = True
     use_diagonal_covariance: bool = True
     covariance_epsilon: float = 1e-6
+    # Covariance estimation strategy
+    covariance_method: str = 'robust'  # 'classical', 'robust', 'cellwise'
+    covariance_rank: Optional[int] = None  # Auto: ceil(sqrt(d))
+    mcd_support_fraction: Optional[float] = None  # Auto-determined by MCD
 
     # Low-dimensional space
     target_dim: int = 32
@@ -202,6 +200,7 @@ class STAPv4Config:
     random_state: int = 42
     device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+
 # ============================================================================
 # CLIP Encoder (Secure Version)
 # ============================================================================
@@ -211,7 +210,7 @@ class CLIPEncoder:
     CLIP encoder for image-text embeddings with secure token handling.
     """
 
-    def __init__(self, model_name: str = "openai/clip-vit-base-patch32", 
+    def __init__(self, model_name: str = "openai/clip-vit-base-patch32",
                  device: str = None, hf_token: Optional[str] = None):
         """
         Initialize CLIP encoder securely.
@@ -222,15 +221,15 @@ class CLIPEncoder:
             hf_token: Optional Hugging Face token (uses secure retrieval if None)
         """
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
-        
+
         # Use provided token or safely retrieve one
         token_to_use = hf_token or HF_TOKEN
-        
+
         # Load model with authentication if token available
         try:
             if token_to_use:
                 self.model = CLIPModel.from_pretrained(
-                    model_name, 
+                    model_name,
                     use_auth_token=token_to_use
                 )
                 self.processor = CLIPProcessor.from_pretrained(
@@ -242,7 +241,7 @@ class CLIPEncoder:
                 self.model = CLIPModel.from_pretrained(model_name)
                 self.processor = CLIPProcessor.from_pretrained(model_name)
                 logger.info(f"CLIP encoder initialized without authentication: {model_name}")
-                
+
         except Exception as e:
             logger.warning(f"Failed to initialize CLIP encoder: {e}")
             # Fallback to without authentication
@@ -322,6 +321,7 @@ class CLIPEncoder:
             embeddings = outputs / outputs.norm(dim=-1, keepdim=True)
 
         return embeddings.cpu().numpy()
+
 
 # ============================================================================
 # Node2Vec Encoder
@@ -456,14 +456,20 @@ class Node2VecEncoder:
 
         return float(weight)
 
+
 # ============================================================================
 # Multi-Modal Mahalanobis Distance (High-Dimensional Space)
 # ============================================================================
 
-class MultiModalMahalanobisDistance:
+class Align2World:
     """
     Implements multi-modal Mahalanobis distance for high-dimensional space.
     Combines text, image, network, and engagement embeddings with covariance-aware distance.
+
+    Uses robust low-rank + diagonal covariance estimation (Section 2.1.2):
+    - Minimum Covariance Determinant (MCD) for outlier resistance
+    - SVD-based low-rank approximation: Σ ≈ U_k U_k^T + D
+    - Cholesky decomposition for efficient distance computation
     """
 
     def __init__(self, config: STAPv4Config):
@@ -474,13 +480,10 @@ class MultiModalMahalanobisDistance:
             config: STAP v4.0 configuration
         """
         self.config = config
-        self.Sigma = None
-        self.Sigma_inv = None
-        self.L = None  # Cholesky factor
-        self.mu = None
+        self.estimator = None
         self.is_fitted = False
 
-        logger.info("MultiModalMahalanobisDistance initialized")
+        logger.info("Align2World initialized")
 
     def fit(self, X_multimodal: np.ndarray):
         """
@@ -495,35 +498,21 @@ class MultiModalMahalanobisDistance:
             logger.warning("Insufficient data for covariance estimation")
             return
 
-        # Compute mean
-        self.mu = np.mean(X_multimodal, axis=0)
+        # Configure covariance estimation
+        cov_config = CovarianceConfig(
+            method=self.config.covariance_method,
+            rank=self.config.covariance_rank,
+            epsilon=self.config.covariance_epsilon,
+            mcd_support_fraction=self.config.mcd_support_fraction
+        )
 
-        # Compute covariance
-        X_centered = X_multimodal - self.mu
-
-        if self.config.use_diagonal_covariance:
-            # Diagonal approximation for efficiency
-            variances = np.var(X_centered, axis=0)
-            self.Sigma = np.diag(variances + self.config.covariance_epsilon)
-            self.Sigma_inv = np.diag(1.0 / (variances + self.config.covariance_epsilon))
-            self.L = np.diag(np.sqrt(variances + self.config.covariance_epsilon))
-        else:
-            # Full covariance matrix
-            self.Sigma = (X_centered.T @ X_centered) / (N - 1)
-            self.Sigma += self.config.covariance_epsilon * np.eye(d_h)
-
-            # Cholesky decomposition for efficient distance computation
-            try:
-                self.L = cholesky(self.Sigma, lower=True)
-                self.Sigma_inv = np.linalg.inv(self.Sigma)
-            except np.linalg.LinAlgError:
-                logger.warning("Cholesky decomposition failed, using diagonal approximation")
-                self.config.use_diagonal_covariance = True
-                self.fit(X_multimodal)
-                return
+        # Fit robust covariance estimator
+        self.estimator = RobustCovarianceEstimator(cov_config)
+        self.estimator.fit(X_multimodal)
 
         self.is_fitted = True
-        logger.info(f"Covariance matrix fitted: shape={self.Sigma.shape}, diagonal={self.config.use_diagonal_covariance}")
+        logger.info(f"Covariance fitted: method={self.config.covariance_method}, "
+                   f"rank={self.estimator.rank}, dim={d_h}")
 
     def distance(self, x_i: np.ndarray, x_j: np.ndarray) -> float:
         """
@@ -537,19 +526,9 @@ class MultiModalMahalanobisDistance:
             Mahalanobis distance
         """
         if not self.is_fitted:
-            # Fallback to Euclidean distance
             return np.linalg.norm(x_i - x_j)
 
-        diff = x_i - x_j
-
-        if self.config.use_diagonal_covariance:
-            # Efficient computation for diagonal covariance
-            z = diff * np.sqrt(np.diag(self.Sigma_inv))
-            return np.linalg.norm(z)
-        else:
-            # Full Mahalanobis distance using Cholesky factor
-            z = solve_triangular(self.L, diff, lower=True)
-            return np.linalg.norm(z)
+        return self.estimator.align_to_world(x_i, x_j)
 
     def probability(self, x_i: np.ndarray, x_j: np.ndarray, sigma_i: float) -> float:
         """
@@ -566,11 +545,24 @@ class MultiModalMahalanobisDistance:
         d = self.distance(x_i, x_j)
         return np.exp(-d**2 / (2 * sigma_i**2))
 
+    def get_covariance(self) -> np.ndarray:
+        """Get estimated covariance matrix."""
+        if not self.is_fitted:
+            return None
+        return self.estimator.get_covariance()
+
+    def get_precision(self) -> np.ndarray:
+        """Get precision matrix (inverse covariance)."""
+        if not self.is_fitted:
+            return None
+        return self.estimator.get_precision()
+
+
 # ============================================================================
 # Hyperbolic Geometry (Low-Dimensional Space)
 # ============================================================================
 
-class HyperbolicSpace:
+class Flow2World:
     """
     Implements hyperbolic geometry operations in the Poincaré ball model.
     """
@@ -679,6 +671,7 @@ class HyperbolicSpace:
         result = self.mobius_addition(y, tanh_term * v_normalized)
         return result
 
+
 # ============================================================================
 # Contrastive Loss for Hyperbolic Space
 # ============================================================================
@@ -688,15 +681,15 @@ class HyperbolicContrastiveLoss:
     Implements contrastive loss in hyperbolic space.
     """
 
-    def __init__(self, hyperbolic_space: HyperbolicSpace, margin: float = 2.0):
+    def __init__(self, flow_to_world: Flow2World, margin: float = 2.0):
         """
         Initialize contrastive loss.
 
         Args:
-            hyperbolic_space: HyperbolicSpace instance
+            flow_to_world: Flow2World instance
             margin: Margin for dissimilar pairs
         """
-        self.hyperbolic_space = hyperbolic_space
+        self.flow_to_world = flow_to_world
         self.margin = margin
 
     def compute_loss(
@@ -718,12 +711,12 @@ class HyperbolicContrastiveLoss:
         """
         loss_similar = 0.0
         for i, j in similar_pairs:
-            d_H = self.hyperbolic_space.hyperbolic_distance(Y[i], Y[j])
+            d_H = self.flow_to_world.hyperbolic_distance(Y[i], Y[j])
             loss_similar += d_H ** 2
 
         loss_dissimilar = 0.0
         for i, k in dissimilar_pairs:
-            d_H = self.hyperbolic_space.hyperbolic_distance(Y[i], Y[k])
+            d_H = self.flow_to_world.hyperbolic_distance(Y[i], Y[k])
             loss_dissimilar += max(0, self.margin - d_H) ** 2
 
         total_loss = loss_similar / max(len(similar_pairs), 1) + \
@@ -753,7 +746,7 @@ class HyperbolicContrastiveLoss:
 
         # Similar pairs gradient
         for i, j in similar_pairs:
-            d_H = self.hyperbolic_space.hyperbolic_distance(Y[i], Y[j])
+            d_H = self.flow_to_world.hyperbolic_distance(Y[i], Y[j])
             if d_H > 1e-10:
                 coeff = 2 * d_H
                 grad[i] += coeff * (Y[i] - Y[j])
@@ -761,7 +754,7 @@ class HyperbolicContrastiveLoss:
 
         # Dissimilar pairs gradient
         for i, k in dissimilar_pairs:
-            d_H = self.hyperbolic_space.hyperbolic_distance(Y[i], Y[k])
+            d_H = self.flow_to_world.hyperbolic_distance(Y[i], Y[k])
             if d_H < self.margin:
                 coeff = -2 * (self.margin - d_H)
                 grad[i] += coeff * (Y[i] - Y[k])
@@ -771,6 +764,7 @@ class HyperbolicContrastiveLoss:
         grad /= max(len(similar_pairs) + len(dissimilar_pairs), 1)
 
         return grad
+
 
 # ============================================================================
 # Siamese Neural Network for Bridge-Aware Scoring
@@ -873,6 +867,7 @@ class SiameseNetwork(nn.Module):
 
         return float(score.item())
 
+
 # ============================================================================
 # STAP v4.0 Preprocessing Layer (GitHub-Friendly Version)
 # ============================================================================
@@ -885,7 +880,7 @@ class STAPv4PreprocessingLayer:
     3. Siamese Neural Network (bridge-aware scoring)
     4. CLIP Integration (image-text embeddings)
     5. Node2Vec Integration (network structure embeddings)
-    
+
     GitHub-Friendly: No hardcoded secrets, secure token handling
     """
 
@@ -908,7 +903,7 @@ class STAPv4PreprocessingLayer:
         if self.config.use_clip:
             try:
                 self.clip_encoder = CLIPEncoder(
-                    self.config.clip_model, 
+                    self.config.clip_model,
                     self.config.device,
                     hf_token=HF_TOKEN  # Pass the securely retrieved token
                 )
@@ -946,10 +941,10 @@ class STAPv4PreprocessingLayer:
         self.index_to_user_id = {}
 
         # Initialize components
-        self.mahalanobis_distance = MultiModalMahalanobisDistance(self.config)
-        self.hyperbolic_space = HyperbolicSpace(self.config.target_dim)
+        self.align_to_world = Align2World(self.config)
+        self.flow_to_world = Flow2World(self.config.target_dim)
         self.contrastive_loss = HyperbolicContrastiveLoss(
-            self.hyperbolic_space,
+            self.flow_to_world,
             margin=self.config.hyperbolic_margin
         )
 
@@ -1014,7 +1009,7 @@ class STAPv4PreprocessingLayer:
 
             # Initialize low-dimensional embedding in Poincaré ball
             initial_embedding = np.random.randn(self.config.target_dim) * 0.01
-            initial_embedding = self.hyperbolic_space.project_to_ball(initial_embedding)
+            initial_embedding = self.flow_to_world.project_to_ball(initial_embedding)
             self.low_dim_embeddings.append(initial_embedding)
 
         # Step 3: Update Node2Vec graph if network connections provided
@@ -1049,7 +1044,7 @@ class STAPv4PreprocessingLayer:
         network_connections: Optional[List[Tuple[str, str, float]]]
     ) -> np.ndarray:
         """
-        Generate multi-modal embedding by fusing text, image, network, and engagement data.
+        """Generate multi-modal embedding by fusing text, image, network, and engagement data.
 
         Args:
             text_corpus: List of text strings
