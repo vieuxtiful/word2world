@@ -1,30 +1,18 @@
 """
-Word2World Social Platform - Complete STAP v4.0 Engine
-Bridging Ideas Together
-
-This is the complete standalone implementation integrating:
-1. Align2World: Multi-Modal Mahalanobis Distance with Robust Covariance
-2. Flow2World: Hyperbolic Projection with STAP Optimization
-3. Bridge2World: Siamese Transformer for Bridge Prediction
+Word2World v4.0 - Social Platform Engine (GitHub Version)
+Advanced multi-modal embedding system with robust covariance estimation,
+stable hyperbolic geometry, and manifold-aware regularization.
 
 Authors: Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang
-Institution: Middlebury Institute of International Studies at Monterey (MIIS)
-Date: October 23, 2025
+Date: October 24, 2025
 Version: 4.0
 License: MIT
 
-Components:
-- Multi-modal embeddings (Text, Image, Network, Engagement)
-- Robust covariance estimation with MCD
-- Low-rank approximation for scalability
-- Hyperbolic geometry for hierarchical structure
-- Contrastive loss for boundary classification
-- Siamese Transformer for bridge prediction
-- HNSW indexing for efficient search
-
 Installation:
-    pip install numpy scipy scikit-learn torch transformers sentence-transformers \
-                pillow requests networkx node2vec hnswlib matplotlib
+    pip install torch transformers sentence-transformers scikit-learn networkx gensim nltk numpy pandas matplotlib seaborn plotly
+
+Environment Variables:
+    HF_TOKEN: Hugging Face API token for model access
 
 Usage:
     from word2world import STAPv4PreprocessingLayer, STAPv4Config
@@ -32,18 +20,29 @@ Usage:
     config = STAPv4Config()
     stap = STAPv4PreprocessingLayer(config)
     
-    # Generate semantic coordinates
     coordinate, confidence = stap.generate_semantic_coordinate(
         user_id="user123",
-        user_corpus=["post1", "post2"],
+        user_corpus=["Building bridges through dialogue"],
         engagement_patterns={},
         user_images=[],
         user_connections=[]
     )
-    
-    # Find bridges
-    bridges = stap.find_bridges(user_id="user123", k=10)
 """
+
+import userdata
+import os
+
+try:
+    HF_TOKEN = userdata.get('HF_TOKEN')
+    os.environ['HF_TOKEN'] = HF_TOKEN
+    print("✓ HF_TOKEN loaded from Colab Secrets")
+except:
+    print("⚠️  HF_TOKEN not found in Colab Secrets")
+    print("   Add it via the 🔑 icon in the left sidebar")
+
+# ============================================================================
+# IMPORTS
+# ============================================================================
 
 # -*- coding: utf-8 -*-
 """Word2World.ipynb
@@ -168,12 +167,12 @@ License: MIT
 @dataclass
 class CovarianceConfig:
     """Configuration for covariance estimation strategies."""
-    
+
     method: Literal['classical', 'robust', 'cellwise'] = 'robust'
     rank: Optional[int] = None  # Auto: ceil(sqrt(d))
     epsilon: float = 1e-6
     mcd_support_fraction: Optional[float] = None  # Auto-determined by MCD
-    
+
     def get_rank(self, n_features: int) -> int:
         """Get rank for low-rank approximation."""
         if self.rank is not None:
@@ -184,18 +183,18 @@ class CovarianceConfig:
 class RobustCovarianceEstimator:
     """
     Robust covariance estimator using MCD with low-rank + diagonal decomposition.
-    
+
     Implements Section 2.1.2 of the technical paper:
     - Minimum Covariance Determinant for outlier resistance
     - Low-rank approximation via SVD for scalability
     - Diagonal residual for full-rank representation
     - Cholesky decomposition for efficient distance computation
     """
-    
+
     def __init__(self, config: CovarianceConfig):
         """
         Initialize robust covariance estimator.
-        
+
         Args:
             config: Covariance estimation configuration
         """
@@ -208,25 +207,25 @@ class RobustCovarianceEstimator:
         self.D = None
         self.mcd_estimator = None
         self.is_fitted = False
-        
+
     def fit(self, X: np.ndarray) -> 'RobustCovarianceEstimator':
         """
         Fit robust covariance estimator.
-        
+
         Args:
             X: (N, d) data matrix
-            
+
         Returns:
             self
         """
         N, d = X.shape
-        
+
         if N < 2:
             logger.warning("Insufficient samples for covariance estimation")
             return self
-            
+
         self.rank = self.config.get_rank(d)
-        
+
         if self.config.method == 'classical':
             self._fit_classical(X)
         elif self.config.method == 'robust':
@@ -235,21 +234,125 @@ class RobustCovarianceEstimator:
             self._fit_cellwise(X)
         else:
             raise ValueError(f"Unknown method: {self.config.method}")
-            
+
         self.is_fitted = True
         return self
+
+    
+    def fit_shrinkage(self, X: np.ndarray, method: str = 'ledoit_wolf', target: str = 'diagonal'):
+        """
+        Fit covariance using shrinkage estimation.
         
+        Σ_shrink = α·S + (1-α)·T
+        where S = sample covariance, T = target, α = shrinkage intensity
+        
+        Args:
+            X: Data matrix (N, d)
+            method: 'ledoit_wolf' or 'oas'
+            target: 'diagonal', 'identity', or 'pooled'
+        """
+        from sklearn.covariance import LedoitWolf, OAS
+        
+        if method == 'ledoit_wolf':
+            estimator = LedoitWolf()
+        elif method == 'oas':
+            estimator = OAS()
+        else:
+            raise ValueError(f"Unknown shrinkage method: {method}")
+        
+        estimator.fit(X)
+        self.cov_ = estimator.covariance_
+        self.mu_ = estimator.location_
+        self.shrinkage_alpha_ = getattr(estimator, 'shrinkage_', None)
+        
+        # Apply low-rank decomposition if configured
+        if self.config.covariance_rank is not None:
+            self._apply_low_rank_decomposition()
+        
+        self._compute_cholesky()
+        
+        return self
+    
+    def compute_local_covariances(self, X: np.ndarray, k: int = 10, kernel: str = 'gaussian'):
+        """
+        Compute local covariance matrices in k-nearest neighborhoods.
+        
+        Args:
+            X: Data matrix (N, d)
+            k: Number of nearest neighbors
+            kernel: 'gaussian', 'uniform', or 'none'
+        
+        Returns:
+            List of local covariance matrices
+        """
+        from sklearn.neighbors import NearestNeighbors
+        
+        nbrs = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(X)
+        local_covs = []
+        local_mus = []
+        
+        for i in range(X.shape[0]):
+            _, idxs = nbrs.kneighbors([X[i]])
+            neighbors = X[idxs[0]]
+            
+            # Compute local mean
+            mu_local = np.mean(neighbors, axis=0)
+            
+            # Compute local covariance with optional kernel weighting
+            if kernel == 'gaussian':
+                distances = np.linalg.norm(neighbors - X[i], axis=1)
+                sigma = np.median(distances) + 1e-10
+                weights = np.exp(-distances**2 / (2 * sigma**2))
+                weights = weights / np.sum(weights)
+                
+                # Weighted covariance
+                centered = neighbors - mu_local
+                cov_local = (centered.T @ np.diag(weights) @ centered)
+            elif kernel == 'uniform':
+                cov_local = np.cov(neighbors.T)
+            else:  # 'none'
+                cov_local = np.cov(neighbors.T)
+            
+            # Regularize
+            cov_local += np.eye(cov_local.shape[0]) * self.config.covariance_epsilon
+            
+            local_covs.append(cov_local)
+            local_mus.append(mu_local)
+        
+        return local_covs, local_mus
+    
+    def fit_with_local_refinement(self, X: np.ndarray, k: int = 10):
+        """
+        Fit global covariance then refine with local estimates.
+        
+        Args:
+            X: Data matrix (N, d)
+            k: Number of nearest neighbors for local estimation
+        """
+        # First fit global covariance
+        self.fit(X)
+        
+        # Compute local covariances
+        local_covs, local_mus = self.compute_local_covariances(X, k=k)
+        
+        # Store for potential use in distance computation
+        self.local_covs_ = local_covs
+        self.local_mus_ = local_mus
+        self.has_local_covs_ = True
+        
+        return self
+
     def _fit_classical(self, X: np.ndarray):
         """Classical sample covariance with low-rank decomposition."""
         self.mu = np.mean(X, axis=0)
         X_centered = X - self.mu
-        
+
         # Sample covariance
         cov_full = (X_centered.T @ X_centered) / (X.shape[0] - 1)
-        
+
         # Low-rank decomposition
         self._decompose_covariance(cov_full)
-        
+
     def _fit_robust(self, X: np.ndarray):
         """Robust covariance using MCD with low-rank decomposition."""
         # MCD estimation
@@ -257,54 +360,54 @@ class RobustCovarianceEstimator:
             support_fraction=self.config.mcd_support_fraction,
             random_state=42
         )
-        
+
         try:
             mcd.fit(X)
             self.mcd_estimator = mcd
             self.mu = mcd.location_
             cov_robust = mcd.covariance_
-            
+
             # Low-rank decomposition
             self._decompose_covariance(cov_robust)
-            
+
             logger.info(f"MCD fitted: support={mcd.support_.sum()}/{X.shape[0]}")
-            
+
         except Exception as e:
             logger.warning(f"MCD failed: {e}, falling back to classical")
             self._fit_classical(X)
-            
+
     def _fit_cellwise(self, X: np.ndarray):
         """Cellwise robust covariance (placeholder for RobPy integration)."""
         logger.warning("Cellwise MCD not implemented, using robust MCD")
         self._fit_robust(X)
-        
+
     def _decompose_covariance(self, cov_full: np.ndarray):
         """
         Decompose covariance into low-rank + diagonal.
-        
+
         Σ ≈ U_k U_k^T + D
-        
+
         Args:
             cov_full: Full covariance matrix
         """
         d = cov_full.shape[0]
-        
+
         # SVD decomposition
         U, S, Vt = np.linalg.svd(cov_full)
-        
+
         # Low-rank factor: U_k * sqrt(S_k)
         self.U_k = U[:, :self.rank] * np.sqrt(S[:self.rank])
-        
+
         # Diagonal residual
         residual = cov_full - self.U_k @ self.U_k.T
         self.D = np.diag(np.diag(residual))
-        
+
         # Reconstruct approximation
         self.cov = self.U_k @ self.U_k.T + self.D
-        
+
         # Add regularization
         self.cov += self.config.epsilon * np.eye(d)
-        
+
         # Cholesky decomposition
         try:
             self.L = cholesky(self.cov, lower=True)
@@ -312,50 +415,50 @@ class RobustCovarianceEstimator:
             logger.warning("Cholesky failed, increasing regularization")
             self.cov += 10 * self.config.epsilon * np.eye(d)
             self.L = cholesky(self.cov, lower=True)
-            
+
         logger.info(f"Covariance decomposed: rank={self.rank}, dim={d}")
-        
+
     def mahalanobis_distance(self, x: np.ndarray, y: np.ndarray) -> float:
         """
         Compute Mahalanobis distance using Cholesky factor.
-        
+
         d_M(x, y) = sqrt((x-y)^T Σ^{-1} (x-y))
                   = ||L^{-1}(x-y)||_2
-        
+
         Args:
             x: First vector
             y: Second vector
-            
+
         Returns:
             Mahalanobis distance
         """
         if not self.is_fitted:
             return np.linalg.norm(x - y)
-            
+
         diff = np.asarray(x) - np.asarray(y)
         z = solve_triangular(self.L, diff, lower=True)
         return np.sqrt(np.dot(z, z))
-        
+
     def transform(self, X: np.ndarray) -> np.ndarray:
         """
         Transform data to whitened space: Z = L^{-1}(X - μ).
-        
+
         Args:
             X: (N, d) data matrix
-            
+
         Returns:
             (N, d) whitened data
         """
         if not self.is_fitted:
             return X
-            
+
         X_centered = X - self.mu
         return solve_triangular(self.L, X_centered.T, lower=True).T
-        
+
     def get_covariance(self) -> np.ndarray:
         """Get estimated covariance matrix."""
         return self.cov if self.is_fitted else None
-        
+
     def get_precision(self) -> np.ndarray:
         """Get precision matrix (inverse covariance)."""
         if not self.is_fitted:
@@ -823,6 +926,36 @@ class STAPv4Config:
     # General
     random_state: int = 42
     device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
+    
+    # Robust Covariance Estimation
+    use_shrinkage: bool = False
+    shrinkage_method: str = 'ledoit_wolf'  # 'ledoit_wolf', 'oas'
+    shrinkage_target: str = 'diagonal'  # 'diagonal', 'identity', 'pooled'
+    use_local_covariance: bool = False
+    local_k_neighbors: int = 10
+    local_kernel: str = 'gaussian'  # 'gaussian', 'uniform', 'none'
+    
+    # Hyperbolic Stability
+    use_taylor_approximation: bool = True
+    taylor_threshold: float = 0.1
+    
+    # Manifold Regularizers
+    use_manifold_regularizers: bool = True
+    lambda_manifold: float = 0.3
+    lambda_taylor_consistency: float = 0.3
+    lambda_curvature: float = 0.25
+    lambda_conformality: float = 0.2
+    lambda_radius: float = 0.15
+    lambda_entropy: float = 0.1
+    
+    # Momentum Contrastive Learning
+    use_moco: bool = False
+    moco_queue_size: int = 4096
+    moco_momentum: float = 0.999
+    
+    # Triplet Loss
+    use_triplet_loss: bool = False
+    triplet_margin: float = 1.0
 
 
 # ============================================================================
@@ -1217,36 +1350,67 @@ class Flow2World:
             return (max_norm / (norm + self.eps)) * y
         return y
 
-    def hyperbolic_distance(self, y_i: np.ndarray, y_j: np.ndarray) -> float:
+    def hyperbolic_distance(self, x: torch.Tensor, y: torch.Tensor, 
+                           use_taylor: bool = None) -> torch.Tensor:
         """
-        Compute hyperbolic distance in Poincaré ball.
-
+        Compute stable hyperbolic distance in Poincaré ball with Taylor approximation.
+        
+        d_H(x,y) = arccosh(1 + 2·||x-y||²/((1-||x||²)(1-||y||²)))
+        
+        For points near boundary (||x|| > 1-ε), uses Taylor approximation:
+        d_H(x,y) ≈ ||x-y|| + (1/6)||x-y||³
+        
         Args:
-            y_i: Point in Poincaré ball
-            y_j: Point in Poincaré ball
-
+            x: First embedding (batch_size, d) or (d,)
+            y: Second embedding (batch_size, d) or (d,)
+            use_taylor: Override config setting for Taylor approximation
+        
         Returns:
-            Hyperbolic distance
+            Hyperbolic distance (batch_size,) or scalar
         """
-        # Ensure points are in the ball
-        y_i = self.project_to_ball(y_i)
-        y_j = self.project_to_ball(y_j)
-
-        # Compute squared Euclidean distance
-        diff_squared = np.sum((y_i - y_j) ** 2)
-
+        if use_taylor is None:
+            use_taylor = self.config.use_taylor_approximation
+        
+        # Ensure tensors are 2D
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
+        if y.dim() == 1:
+            y = y.unsqueeze(0)
+        
         # Compute norms
-        norm_i_squared = np.sum(y_i ** 2)
-        norm_j_squared = np.sum(y_j ** 2)
-
-        # Hyperbolic distance formula
-        numerator = 2 * diff_squared
-        denominator = (1 - norm_i_squared) * (1 - norm_j_squared) + self.eps
-
-        distance = np.arccosh(1 + numerator / denominator)
-
-        return distance
-
+        norm_x = torch.norm(x, dim=-1, keepdim=True)
+        norm_y = torch.norm(y, dim=-1, keepdim=True)
+        
+        # Clamp to stay within Poincaré ball
+        norm_x = torch.clamp(norm_x, max=0.99)
+        norm_y = torch.clamp(norm_y, max=0.99)
+        
+        # Check if near boundary
+        taylor_threshold = self.config.taylor_threshold
+        near_boundary = (norm_x > (1 - taylor_threshold)) | (norm_y > (1 - taylor_threshold))
+        
+        # Compute exact hyperbolic distance
+        diff_norm_sq = torch.sum((x - y)**2, dim=-1, keepdim=True)
+        denom = (1 - norm_x**2) * (1 - norm_y**2)
+        denom = torch.clamp(denom, min=1e-15)  # Prevent division by zero
+        
+        alpha = 1 + 2 * diff_norm_sq / denom
+        alpha = torch.clamp(alpha, min=1.0)  # Ensure alpha >= 1
+        
+        # Logarithmic reformulation for stability
+        d_exact = torch.log(alpha + torch.sqrt(alpha**2 - 1))
+        
+        # Taylor approximation for boundary points
+        if use_taylor:
+            diff_norm = torch.sqrt(diff_norm_sq + 1e-15)
+            d_taylor = diff_norm + (1/6) * diff_norm**3
+            
+            # Blend based on proximity to boundary
+            d = torch.where(near_boundary.squeeze(-1), d_taylor.squeeze(-1), d_exact.squeeze(-1))
+        else:
+            d = d_exact.squeeze(-1)
+        
+        return d
     def mobius_addition(self, y: np.ndarray, v: np.ndarray) -> np.ndarray:
         """
         Möbius addition in Poincaré ball.
@@ -1394,6 +1558,382 @@ class HyperbolicContrastiveLoss:
 # Siamese Neural Network for Bridge-Aware Scoring
 # ============================================================================
 
+
+# ============================================================================
+# MOMENTUM CONTRASTIVE LEARNING (MoCo)
+# ============================================================================
+
+class MoCoQueue:
+    """
+    Momentum Contrast queue for robust negative sampling.
+    
+    Maintains a queue of embeddings updated with momentum for consistent
+    negative samples across batches.
+    """
+    
+    def __init__(self, dim: int, K: int = 4096, momentum: float = 0.999):
+        """
+        Args:
+            dim: Embedding dimension
+            K: Queue size
+            momentum: Momentum coefficient for queue updates
+        """
+        self.dim = dim
+        self.K = K
+        self.momentum = momentum
+        self.queue = torch.zeros(K, dim)
+        self.ptr = 0
+    
+    def enqueue(self, embeddings: torch.Tensor):
+        """
+        Add embeddings to queue with FIFO policy.
+        
+        Args:
+            embeddings: Batch of embeddings (batch_size, dim)
+        """
+        batch_size = embeddings.shape[0]
+        
+        # Ensure we don't overflow
+        if batch_size > self.K:
+            embeddings = embeddings[:self.K]
+            batch_size = self.K
+        
+        # Replace oldest embeddings
+        end_ptr = self.ptr + batch_size
+        if end_ptr <= self.K:
+            self.queue[self.ptr:end_ptr] = embeddings.detach()
+        else:
+            # Wrap around
+            overflow = end_ptr - self.K
+            self.queue[self.ptr:] = embeddings[:self.K - self.ptr].detach()
+            self.queue[:overflow] = embeddings[self.K - self.ptr:].detach()
+        
+        self.ptr = end_ptr % self.K
+    
+    def get_negatives(self, n: int = None):
+        """
+        Sample negatives from queue.
+        
+        Args:
+            n: Number of negatives to sample (None = all)
+        
+        Returns:
+            Negative embeddings (n, dim) or (K, dim)
+        """
+        if n is None:
+            return self.queue
+        else:
+            indices = torch.randperm(self.K)[:n]
+            return self.queue[indices]
+    
+    def to(self, device):
+        """Move queue to device"""
+        self.queue = self.queue.to(device)
+        return self
+
+
+# ============================================================================
+# HYPERBOLIC TRIPLET LOSS
+# ============================================================================
+
+class HyperbolicTripletLoss(nn.Module):
+    """
+    Triplet loss in hyperbolic space for bridge validation.
+    
+    L_triplet = Σ max(0, margin + d_H(anchor, positive) - d_H(anchor, negative))
+    
+    Encourages:
+    - Small distance between anchor and positive (similar users)
+    - Large distance between anchor and negative (dissimilar users)
+    """
+    
+    def __init__(self, margin: float = 1.0):
+        """
+        Args:
+            margin: Minimum separation between positive and negative distances
+        """
+        super().__init__()
+        self.margin = margin
+    
+    def forward(self, anchor: torch.Tensor, positive: torch.Tensor, 
+                negative: torch.Tensor, hyperbolic_dist_fn):
+        """
+        Compute triplet loss.
+        
+        Args:
+            anchor: Anchor embeddings (batch_size, dim)
+            positive: Positive embeddings (batch_size, dim)
+            negative: Negative embeddings (batch_size, dim)
+            hyperbolic_dist_fn: Function to compute hyperbolic distance
+        
+        Returns:
+            Triplet loss (scalar)
+        """
+        # Compute distances
+        dist_pos = hyperbolic_dist_fn(anchor, positive)
+        dist_neg = hyperbolic_dist_fn(anchor, negative)
+        
+        # Triplet loss with margin
+        loss = torch.relu(self.margin + dist_pos - dist_neg)
+        
+        return torch.mean(loss)
+    
+    def mine_hard_negatives(self, anchor: torch.Tensor, negatives: torch.Tensor,
+                           hyperbolic_dist_fn, k: int = 10):
+        """
+        Mine hard negatives (closest negatives to anchor).
+        
+        Args:
+            anchor: Anchor embedding (1, dim)
+            negatives: Candidate negatives (N, dim)
+            hyperbolic_dist_fn: Distance function
+            k: Number of hard negatives to select
+        
+        Returns:
+            Hard negative embeddings (k, dim)
+        """
+        # Compute distances to all negatives
+        distances = torch.stack([
+            hyperbolic_dist_fn(anchor, neg.unsqueeze(0))
+            for neg in negatives
+        ])
+        
+        # Select k closest (hardest) negatives
+        _, indices = torch.topk(distances, k, largest=False)
+        
+        return negatives[indices]
+
+
+
+
+# ============================================================================
+# MANIFOLD REGULARIZERS FOR HYPERBOLIC SPACE
+# ============================================================================
+
+class ManifoldRegularizers(nn.Module):
+    """
+    Collection of manifold-aware regularizers for stable hyperbolic optimization.
+    
+    Implements 5 regularizers from Bu et al. (2025), Nickel & Kiela (2017), 
+    Chami et al. (2019), and related work.
+    """
+    
+    def __init__(self, config: 'STAPv4Config'):
+        super().__init__()
+        self.config = config
+        self.gamma = config.gamma if hasattr(config, 'gamma') else 2.0
+    
+    def curvature_gradient_regularizer(self, y: torch.Tensor, grad_y: torch.Tensor):
+        """
+        R_curv = Σ_i ||∇y_i||² · (1 - ||y_i||²)^(-2)
+        
+        Prevents exploding gradients near boundary by accounting for metric tensor scaling.
+        
+        Args:
+            y: Embeddings in Poincaré ball (N, d)
+            grad_y: Gradients w.r.t. y (N, d)
+        
+        Returns:
+            Curvature-sensitive gradient penalty (scalar)
+        """
+        norm_y = torch.norm(y, dim=-1, keepdim=True)
+        norm_y = torch.clamp(norm_y, max=0.99)  # Prevent division by zero
+        
+        # Metric tensor factor: g(y) = (2 / (1 - ||y||²))²
+        metric_factor = 1 / ((1 - norm_y**2 + 1e-15)**2)
+        
+        # Gradient norm squared
+        grad_norm_sq = torch.sum(grad_y**2, dim=-1, keepdim=True)
+        
+        # Weighted gradient penalty
+        penalty = grad_norm_sq * metric_factor
+        
+        return torch.mean(penalty)
+    
+    def taylor_consistency_penalty(self, y_i: torch.Tensor, y_j: torch.Tensor,
+                                   hyperbolic_dist_fn):
+        """
+        R_Taylor = Σ_{i,j} |d_H(y_i, y_j) - d_Taylor(y_i, y_j)|²
+        
+        Minimizes discrepancy between exact hyperbolic distance and Taylor approximation.
+        
+        Args:
+            y_i: First set of embeddings (N, d)
+            y_j: Second set of embeddings (N, d)
+            hyperbolic_dist_fn: Function that computes hyperbolic distance
+        
+        Returns:
+            Taylor consistency penalty (scalar)
+        """
+        # Compute exact distance
+        d_exact = hyperbolic_dist_fn(y_i, y_j, use_taylor=False)
+        
+        # Compute Taylor approximation
+        d_taylor = hyperbolic_dist_fn(y_i, y_j, use_taylor=True)
+        
+        # Minimize discrepancy
+        penalty = (d_exact - d_taylor)**2
+        
+        return torch.mean(penalty)
+    
+    def manifold_conformality_regularizer(self, y: torch.Tensor, grad_y: torch.Tensor):
+        """
+        R_conf = Σ_i (||y_i|| - ||∇y_i||)²
+        
+        Maintains conformal structure by coupling radial position with gradient magnitude.
+        
+        Args:
+            y: Embeddings (N, d)
+            grad_y: Gradients (N, d)
+        
+        Returns:
+            Conformality penalty (scalar)
+        """
+        norm_y = torch.norm(y, dim=-1)
+        grad_norm = torch.norm(grad_y, dim=-1)
+        
+        penalty = (norm_y - grad_norm)**2
+        
+        return torch.mean(penalty)
+    
+    def contrastive_radius_margin_regularizer(self, y_similar: torch.Tensor,
+                                             y_dissimilar: torch.Tensor):
+        """
+        R_radius = Σ_{(i,j)∈S} (||y_i|| - ||y_j||)² 
+                   - Σ_{(i,k)∈D} max(0, γ - |||y_i|| - ||y_k|||)
+        
+        Encourages similar users to occupy similar radial positions (hierarchical clustering).
+        
+        Args:
+            y_similar: Pairs of similar embeddings (N, 2, d)
+            y_dissimilar: Pairs of dissimilar embeddings (M, 2, d)
+        
+        Returns:
+            Radius margin penalty (scalar)
+        """
+        # Similar pairs: minimize radial difference
+        if y_similar.shape[0] > 0:
+            norm_sim_i = torch.norm(y_similar[:, 0], dim=-1)
+            norm_sim_j = torch.norm(y_similar[:, 1], dim=-1)
+            loss_similar = torch.mean((norm_sim_i - norm_sim_j)**2)
+        else:
+            loss_similar = torch.tensor(0.0, device=y_similar.device)
+        
+        # Dissimilar pairs: maximize radial difference (with margin)
+        if y_dissimilar.shape[0] > 0:
+            norm_dis_i = torch.norm(y_dissimilar[:, 0], dim=-1)
+            norm_dis_k = torch.norm(y_dissimilar[:, 1], dim=-1)
+            radial_diff = torch.abs(norm_dis_i - norm_dis_k)
+            loss_dissimilar = torch.mean(torch.relu(self.gamma - radial_diff))
+        else:
+            loss_dissimilar = torch.tensor(0.0, device=y_dissimilar.device)
+        
+        return loss_similar - loss_dissimilar
+    
+    def manifold_entropy_regularizer(self, y: torch.Tensor, n_bins: int = 36):
+        """
+        R_entropy = -H(θ) where H is angular entropy
+        
+        Prevents mode collapse via angular diversity.
+        
+        Args:
+            y: Embeddings (N, d)
+            n_bins: Number of angular bins
+        
+        Returns:
+            Negative entropy (to minimize = maximize entropy)
+        """
+        # For high-dimensional space, use PCA to project to 2D for angle computation
+        if y.shape[1] > 2:
+            # Simple projection to first 2 dimensions
+            y_2d = y[:, :2]
+        else:
+            y_2d = y
+        
+        # Compute angles
+        angles = torch.atan2(y_2d[:, 1], y_2d[:, 0])
+        
+        # Normalize to [0, 2π]
+        angles = (angles + 2 * np.pi) % (2 * np.pi)
+        
+        # Compute histogram
+        hist = torch.histc(angles, bins=n_bins, min=0, max=2*np.pi)
+        
+        # Compute probabilities
+        probs = hist / (torch.sum(hist) + 1e-15)
+        probs = torch.clamp(probs, min=1e-15)
+        
+        # Compute entropy
+        entropy = -torch.sum(probs * torch.log(probs))
+        
+        # Return negative entropy (minimize = maximize entropy)
+        return -entropy
+    
+    def compute_all_regularizers(self, y: torch.Tensor, grad_y: torch.Tensor,
+                                 y_similar: torch.Tensor, y_dissimilar: torch.Tensor,
+                                 hyperbolic_dist_fn):
+        """
+        Compute all 5 manifold regularizers with configured weights.
+        
+        Returns:
+            Dictionary of individual regularizer values and total weighted loss
+        """
+        regularizers = {}
+        
+        # 1. Curvature-sensitive gradient
+        if self.config.lambda_curvature > 0:
+            regularizers['curvature'] = self.curvature_gradient_regularizer(y, grad_y)
+        else:
+            regularizers['curvature'] = torch.tensor(0.0, device=y.device)
+        
+        # 2. Taylor consistency
+        if self.config.lambda_taylor_consistency > 0 and y.shape[0] > 1:
+            # Sample pairs for efficiency
+            n_pairs = min(100, y.shape[0] - 1)
+            indices_i = torch.randint(0, y.shape[0], (n_pairs,))
+            indices_j = torch.randint(0, y.shape[0], (n_pairs,))
+            regularizers['taylor'] = self.taylor_consistency_penalty(
+                y[indices_i], y[indices_j], hyperbolic_dist_fn
+            )
+        else:
+            regularizers['taylor'] = torch.tensor(0.0, device=y.device)
+        
+        # 3. Manifold conformality
+        if self.config.lambda_conformality > 0:
+            regularizers['conformality'] = self.manifold_conformality_regularizer(y, grad_y)
+        else:
+            regularizers['conformality'] = torch.tensor(0.0, device=y.device)
+        
+        # 4. Contrastive radius margin
+        if self.config.lambda_radius > 0:
+            regularizers['radius'] = self.contrastive_radius_margin_regularizer(
+                y_similar, y_dissimilar
+            )
+        else:
+            regularizers['radius'] = torch.tensor(0.0, device=y.device)
+        
+        # 5. Manifold entropy
+        if self.config.lambda_entropy > 0:
+            regularizers['entropy'] = self.manifold_entropy_regularizer(y)
+        else:
+            regularizers['entropy'] = torch.tensor(0.0, device=y.device)
+        
+        # Compute weighted total
+        total = (
+            self.config.lambda_curvature * regularizers['curvature'] +
+            self.config.lambda_taylor_consistency * regularizers['taylor'] +
+            self.config.lambda_conformality * regularizers['conformality'] +
+            self.config.lambda_radius * regularizers['radius'] +
+            self.config.lambda_entropy * regularizers['entropy']
+        )
+        
+        regularizers['total'] = total
+        
+        return regularizers
+
+
+
+
 class SiameseNetwork(nn.Module):
     """
     Siamese neural network for learning bridge success probability.
@@ -1504,8 +2044,6 @@ class STAPv4PreprocessingLayer:
     3. Siamese Neural Network (bridge-aware scoring)
     4. CLIP Integration (image-text embeddings)
     5. Node2Vec Integration (network structure embeddings)
-
-    GitHub-Friendly: No hardcoded secrets, secure token handling
     """
 
     def __init__(self, config: Optional[STAPv4Config] = None):
@@ -1667,7 +2205,7 @@ class STAPv4PreprocessingLayer:
         image_data: Optional[List],
         network_connections: Optional[List[Tuple[str, str, float]]]
     ) -> np.ndarray:
-        """
+
         """Generate multi-modal embedding by fusing text, image, network, and engagement data.
 
         Args:
@@ -1703,7 +2241,6 @@ class STAPv4PreprocessingLayer:
         multimodal_emb = np.con
 
 
-
 # ============================================================================
 # BRIDGE2WORLD: SIAMESE TRANSFORMER FOR BRIDGE PREDICTION
 # ============================================================================
@@ -1715,7 +2252,7 @@ class STAPv4PreprocessingLayer:
 class Bridge2World(nn.Module):
     """
     Bridge2World: Siamese Transformer for bridge prediction.
-    
+
     Args:
         vocab_size: Size of vocabulary
         hidden_dim: Hidden dimension size (default: 384)
@@ -1725,11 +2262,11 @@ class Bridge2World(nn.Module):
         dropout: Dropout rate (default: 0.1)
         activation: Activation function (default: 'gelu')
         layer_norm_eps: Layer normalization epsilon (default: 1e-12)
-        
+
     Returns:
         Tuple of (similarity_score, attention_weights) when return_attn=True
     """
-    
+
     def __init__(
         self,
         vocab_size: int,
@@ -1742,18 +2279,18 @@ class Bridge2World(nn.Module):
         layer_norm_eps: float = 1e-12
     ):
         super(SiameseTransformer, self).__init__()
-        
+
         self.hidden_dim = hidden_dim
         self.num_heads = num_heads
         self.num_layers = num_layers
         self.max_seq_length = max_seq_length
-        
+
         # Embedding layers
         self.token_embedding = nn.Embedding(vocab_size, hidden_dim)
         self.position_embedding = nn.Embedding(max_seq_length, hidden_dim)
         self.dropout = nn.Dropout(dropout)
         self.layer_norm = nn.LayerNorm(hidden_dim, eps=layer_norm_eps)
-        
+
         # Transformer encoder (shared between both branches)
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=hidden_dim,
@@ -1768,14 +2305,14 @@ class Bridge2World(nn.Module):
             encoder_layer,
             num_layers=num_layers
         )
-        
+
         # Output projection
         self.output_projection = nn.Linear(hidden_dim, hidden_dim)
         self.output_activation = nn.Tanh()
-        
+
         # Initialize weights
         self.apply(self._init_weights)
-        
+
     def _init_weights(self, module):
         """Initialize weights for transformer layers"""
         if isinstance(module, nn.Linear):
@@ -1787,9 +2324,9 @@ class Bridge2World(nn.Module):
         elif isinstance(module, nn.LayerNorm):
             torch.nn.init.zeros_(module.bias)
             torch.nn.init.ones_(module.weight)
-            
+
     def forward(
-        self, 
+        self,
         input_ids1: torch.Tensor,
         attention_mask1: torch.Tensor,
         input_ids2: torch.Tensor,
@@ -1797,15 +2334,15 @@ class Bridge2World(nn.Module):
         return_attn: bool = False
     ) -> Union[torch.Tensor, Tuple[torch.Tensor, Dict]]:
         """
-        Forward pass for siamese transformer.
-        
+        Forward pass for Siamese Transformer.
+
         Args:
             input_ids1: Token IDs for first sequence [batch_size, seq_len]
             attention_mask1: Attention mask for first sequence [batch_size, seq_len]
             input_ids2: Token IDs for second sequence [batch_size, seq_len]
             attention_mask2: Attention mask for second sequence [batch_size, seq_len]
             return_attn: Whether to return attention weights
-            
+
         Returns:
             similarity_scores or (similarity_scores, attention_weights)
         """
@@ -1816,19 +2353,19 @@ class Bridge2World(nn.Module):
         embedding2, attn_weights2 = self._encode_sequence(
             input_ids2, attention_mask2, return_attn
         )
-        
+
         # Compute cosine similarity
         similarity_scores = F.cosine_similarity(embedding1, embedding2, dim=-1)
-        
+
         if return_attn:
             attention_weights = {
                 'sequence1': attn_weights1,
                 'sequence2': attn_weights2
             }
             return similarity_scores, attention_weights
-        
+
         return similarity_scores
-    
+
     def _encode_sequence(
         self,
         input_ids: torch.Tensor,
@@ -1837,72 +2374,72 @@ class Bridge2World(nn.Module):
     ) -> Union[torch.Tensor, Tuple[torch.Tensor, list]]:
         """
         Encode a single sequence through transformer.
-        
+
         Args:
             input_ids: Token IDs [batch_size, seq_len]
             attention_mask: Attention mask [batch_size, seq_len]
             return_attn: Whether to return attention weights
-            
+
         Returns:
             Sequence embedding or (embedding, attention_weights)
         """
         batch_size, seq_len = input_ids.shape
-        
+
         # Create position IDs
         position_ids = torch.arange(seq_len, dtype=torch.long, device=input_ids.device)
         position_ids = position_ids.unsqueeze(0).expand(batch_size, -1)
-        
+
         # Get token and position embeddings
         token_embeddings = self.token_embedding(input_ids)
         position_embeddings = self.position_embedding(position_ids)
-        
+
         # Combine embeddings
         embeddings = token_embeddings + position_embeddings
         embeddings = self.layer_norm(embeddings)
         embeddings = self.dropout(embeddings)
-        
+
         # Transformer encoding
         if return_attn:
             # Store attention weights
             attn_weights = []
             def hook_fn(module, input, output):
                 attn_weights.append(output[1])  # output[1] contains attention weights
-            
+
             hooks = []
             for layer in self.transformer_encoder.layers:
                 hook = layer.self_attn.register_forward_hook(hook_fn)
                 hooks.append(hook)
-            
+
             # Forward pass
             encoded = self.transformer_encoder(
-                embeddings, 
+                embeddings,
                 src_key_padding_mask=~attention_mask.bool()
             )
-            
+
             # Remove hooks
             for hook in hooks:
                 hook.remove()
-                
+
         else:
             encoded = self.transformer_encoder(
                 embeddings,
                 src_key_padding_mask=~attention_mask.bool()
             )
             attn_weights = None
-        
+
         # Mean pooling (mask-aware)
         input_mask_expanded = attention_mask.unsqueeze(-1).expand(encoded.size()).float()
         sum_embeddings = torch.sum(encoded * input_mask_expanded, 1)
         sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
         pooled_embeddings = sum_embeddings / sum_mask
-        
+
         # Project and activate
         projected = self.output_projection(pooled_embeddings)
         final_embedding = self.output_activation(projected)
-        
+
         if return_attn:
             return final_embedding, attn_weights
-        
+
         return final_embedding
 
 # ============================================================================
@@ -1912,14 +2449,14 @@ class Bridge2World(nn.Module):
 class SimilarityHead(nn.Module):
     """
     Modular similarity head supporting multiple similarity metrics.
-    
+
     Args:
         hidden_dim: Hidden dimension size
         metric_type: Similarity metric type ('cosine', 'euclidean', 'bilinear', 'manhattan')
         temperature: Temperature for cosine similarity (default: 0.05)
         margin: Margin for distance-based metrics (default: 1.0)
     """
-    
+
     def __init__(
         self,
         hidden_dim: int,
@@ -1928,12 +2465,12 @@ class SimilarityHead(nn.Module):
         margin: float = 1.0
     ):
         super(ModularSimilarityHead, self).__init__()
-        
+
         self.hidden_dim = hidden_dim
         self.metric_type = metric_type
         self.temperature = temperature
         self.margin = margin
-        
+
         if metric_type == 'bilinear':
             self.bilinear = nn.Bilinear(hidden_dim, hidden_dim, 1)
             nn.init.xavier_uniform_(self.bilinear.weight)
@@ -1946,48 +2483,48 @@ class SimilarityHead(nn.Module):
                 nn.Linear(hidden_dim, 1),
                 nn.Sigmoid()
             )
-    
+
     def forward(
-        self, 
-        embedding1: torch.Tensor, 
+        self,
+        embedding1: torch.Tensor,
         embedding2: torch.Tensor
     ) -> torch.Tensor:
         """
         Compute similarity between two embeddings.
-        
+
         Args:
             embedding1: First embedding [batch_size, hidden_dim]
             embedding2: Second embedding [batch_size, hidden_dim]
-            
+
         Returns:
             Similarity scores [batch_size]
         """
-        
+
         if self.metric_type == 'cosine':
             similarity = F.cosine_similarity(embedding1, embedding2, dim=-1)
             # Apply temperature scaling
             similarity = similarity / self.temperature
             return torch.sigmoid(similarity)
-            
+
         elif self.metric_type == 'euclidean':
             distance = F.pairwise_distance(embedding1, embedding2, p=2)
             similarity = 1.0 / (1.0 + distance)
             return similarity
-            
+
         elif self.metric_type == 'manhattan':
             distance = F.pairwise_distance(embedding1, embedding2, p=1)
             similarity = 1.0 / (1.0 + distance)
             return similarity
-            
+
         elif self.metric_type == 'bilinear':
             similarity = self.bilinear(embedding1, embedding2).squeeze(-1)
             return torch.sigmoid(similarity)
-            
+
         elif self.metric_type == 'projected':
             combined = torch.cat([embedding1, embedding2], dim=-1)
             similarity = self.projection(combined).squeeze(-1)
             return similarity
-            
+
         else:
             raise ValueError(f"Unsupported metric type: {self.metric_type}")
 
@@ -1995,7 +2532,7 @@ class EnhancedBridge2World(SiameseTransformer):
     """
     Enhanced Bridge2World with modular similarity head.
     """
-    
+
     def __init__(
         self,
         vocab_size: int,
@@ -2013,15 +2550,15 @@ class EnhancedBridge2World(SiameseTransformer):
             vocab_size, hidden_dim, num_heads, num_layers,
             max_seq_length, dropout, activation, layer_norm_eps
         )
-        
+
         self.similarity_head = SimilarityHead(
             hidden_dim=hidden_dim,
             metric_type=similarity_metric,
             temperature=temperature
         )
-    
+
     def forward(
-        self, 
+        self,
         input_ids1: torch.Tensor,
         attention_mask1: torch.Tensor,
         input_ids2: torch.Tensor,
@@ -2038,17 +2575,17 @@ class EnhancedBridge2World(SiameseTransformer):
         embedding2, attn_weights2 = self._encode_sequence(
             input_ids2, attention_mask2, return_attn
         )
-        
+
         # Compute similarity using modular head
         similarity_scores = self.similarity_head(embedding1, embedding2)
-        
+
         if return_attn:
             attention_weights = {
                 'sequence1': attn_weights1,
                 'sequence2': attn_weights2
             }
             return similarity_scores, attention_weights
-        
+
         return similarity_scores
 
 # ============================================================================
@@ -2059,7 +2596,7 @@ class AttentionVisualizer:
     """
     Visualization tools for transformer attention weights.
     """
-    
+
     @staticmethod
     def plot_attention_heatmap(
         attention_weights: torch.Tensor,
@@ -2071,7 +2608,7 @@ class AttentionVisualizer:
     ):
         """
         Plot attention heatmap for specific layer and head.
-        
+
         Args:
             attention_weights: Attention weights tensor [num_layers, num_heads, seq_len, seq_len]
             tokens: List of tokens for axis labels
@@ -2085,31 +2622,31 @@ class AttentionVisualizer:
             attn_tensor = torch.stack(attention_weights)
         else:
             attn_tensor = attention_weights
-            
+
         # Get specific layer and head
         if attn_tensor.dim() == 4:
             attn_data = attn_tensor[layer, head].cpu().detach().numpy()
         else:
             attn_data = attn_tensor.cpu().detach().numpy()
-        
+
         fig, ax = plt.subplots(figsize=figsize)
         im = ax.imshow(attn_data, cmap=cmap, aspect='auto')
-        
+
         # Set labels
         ax.set_xticks(range(len(tokens)))
         ax.set_yticks(range(len(tokens)))
         ax.set_xticklabels(tokens, rotation=45, ha='right')
         ax.set_yticklabels(tokens)
-        
+
         # Add colorbar
         plt.colorbar(im, ax=ax)
         ax.set_title(f'Attention Weights - Layer {layer}, Head {head}')
         ax.set_xlabel('Key Position')
         ax.set_ylabel('Query Position')
-        
+
         plt.tight_layout()
         return fig
-    
+
     @staticmethod
     def plot_multihead_attention(
         attention_weights: torch.Tensor,
@@ -2119,7 +2656,7 @@ class AttentionVisualizer:
     ):
         """
         Plot attention weights for all heads in a layer.
-        
+
         Args:
             attention_weights: Attention weights tensor
             tokens: List of tokens
@@ -2130,39 +2667,39 @@ class AttentionVisualizer:
             attn_tensor = torch.stack(attention_weights)
         else:
             attn_tensor = attention_weights
-            
+
         num_heads = attn_tensor.shape[1]
-        
+
         fig, axes = plt.subplots(
-            nrows=int(math.ceil(num_heads / 4)), 
-            ncols=4, 
+            nrows=int(math.ceil(num_heads / 4)),
+            ncols=4,
             figsize=figsize
         )
         axes = axes.flatten() if num_heads > 1 else [axes]
-        
+
         for head in range(num_heads):
             ax = axes[head]
             attn_data = attn_tensor[layer, head].cpu().detach().numpy()
-            
+
             im = ax.imshow(attn_data, cmap='viridis', aspect='auto')
             ax.set_title(f'Head {head}')
-            
+
             if head >= num_heads - 4 or head == num_heads - 1:
                 ax.set_xticks(range(len(tokens)))
                 ax.set_xticklabels(tokens, rotation=45, ha='right')
             else:
                 ax.set_xticks([])
-                
+
             if head % 4 == 0:
                 ax.set_yticks(range(len(tokens)))
                 ax.set_yticklabels(tokens)
             else:
                 ax.set_yticks([])
-        
+
         # Remove empty subplots
         for head in range(num_heads, len(axes)):
             fig.delaxes(axes[head])
-            
+
         plt.tight_layout()
         plt.colorbar(im, ax=axes, location='right', shrink=0.8)
         return fig
@@ -2177,7 +2714,7 @@ def visualize_attention(
 ):
     """
     Visualize attention weights for a single sequence.
-    
+
     Args:
         model: SiameseTransformer instance
         input_ids: Input token IDs
@@ -2193,10 +2730,10 @@ def visualize_attention(
             attention_mask.unsqueeze(0) if attention_mask.dim() == 1 else attention_mask,
             return_attn=True
         )
-    
+
     # Decode tokens
     tokens = tokenizer.convert_ids_to_tokens(input_ids.cpu().numpy())
-    
+
     if head is not None:
         # Single head visualization
         fig = AttentionVisualizer.plot_attention_heatmap(
@@ -2207,7 +2744,7 @@ def visualize_attention(
         fig = AttentionVisualizer.plot_multihead_attention(
             attn_weights, tokens, layer=layer
         )
-    
+
     return fig
 
 # ============================================================================
@@ -2254,17 +2791,17 @@ TRANSFORMER_CONFIGS = {
 def create_siamese_transformer(config_name: str, vocab_size: int) -> EnhancedSiameseTransformer:
     """
     Create SiameseTransformer with predefined configuration.
-    
+
     Args:
         config_name: One of 'base', 'deep', 'lite', 'word2world-optimal'
         vocab_size: Vocabulary size for embedding layer
-        
+
     Returns:
         Configured EnhancedSiameseTransformer instance
     """
     if config_name not in TRANSFORMER_CONFIGS:
         raise ValueError(f"Unknown config: {config_name}. Choose from {list(TRANSFORMER_CONFIGS.keys())}")
-    
+
     config = TRANSFORMER_CONFIGS[config_name]
     return EnhancedBridge2World(
         vocab_size=vocab_size,
@@ -2278,7 +2815,7 @@ def create_siamese_transformer(config_name: str, vocab_size: int) -> EnhancedSia
 class BridgePairDataset(Dataset):
     """
     Dataset for contrastive learning with dynamic padding.
-    
+
     Args:
         texts: List of text samples
         labels: List of corresponding labels
@@ -2287,7 +2824,7 @@ class BridgePairDataset(Dataset):
         pairs_per_sample: Number of pairs to generate per sample
         random_seed: Random seed for reproducibility
     """
-    
+
     def __init__(
         self,
         texts: List[str],
@@ -2303,76 +2840,76 @@ class BridgePairDataset(Dataset):
         self.max_length = max_length
         self.pairs_per_sample = pairs_per_sample
         self.random_seed = random_seed
-        
+
         # Validate inputs
         if len(texts) != len(labels):
             raise ValueError("Texts and labels must have same length")
-            
+
         # Group samples by label
         self.label_to_indices = defaultdict(list)
         for idx, label in enumerate(labels):
             self.label_to_indices[label].append(idx)
-            
+
         # Generate pairs
         self.pairs = self._generate_pairs()
-        
+
         # Set random seed
         random.seed(random_seed)
-        
+
     def _generate_pairs(self) -> List[Tuple[int, int, int]]:
         """
         Generate (anchor_idx, positive_idx, negative_idx) triplets.
-        
+
         Returns:
             List of triplets (anchor_idx, positive_idx, negative_idx, label)
         """
         pairs = []
-        
+
         for anchor_idx, anchor_label in enumerate(self.labels):
             # Get positive samples (same label)
             positive_indices = [
-                idx for idx in self.label_to_indices[anchor_label] 
+                idx for idx in self.label_to_indices[anchor_label]
                 if idx != anchor_idx
             ]
-            
+
             # Get negative samples (different labels)
             negative_labels = [
-                label for label in self.label_to_indices.keys() 
+                label for label in self.label_to_indices.keys()
                 if label != anchor_label
             ]
-            
+
             for _ in range(self.pairs_per_sample):
                 if positive_indices and negative_labels:
                     # Sample positive
                     positive_idx = random.choice(positive_indices)
-                    
+
                     # Sample negative label and then negative sample
                     negative_label = random.choice(negative_labels)
                     negative_idx = random.choice(self.label_to_indices[negative_label])
-                    
+
                     pairs.append((anchor_idx, positive_idx, negative_idx, 1))
-                    
+
                     # Also create a positive pair
                     pairs.append((anchor_idx, positive_idx, positive_idx, 0))
-        
+
         return pairs
-    
+
     def __len__(self) -> int:
         return len(self.pairs)
-    
+
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         anchor_idx, positive_idx, negative_idx, label = self.pairs[idx]
-        
+
         # Get texts
         anchor_text = self.texts[anchor_idx]
         positive_text = self.texts[positive_idx]
         negative_text = self.texts[negative_idx]
-        
+
         # Tokenize
         anchor_tokens = self.tokenizer(
-            anchor_text, 
-            max_length=self.max_length, 
-            padding=False, 
+            anchor_text,
+            max_length=self.max_length,
+            padding=False,
             truncation=True
         )
         positive_tokens = self.tokenizer(
@@ -2387,7 +2924,7 @@ class BridgePairDataset(Dataset):
             padding=False,
             truncation=True
         )
-        
+
         return {
             'anchor_input_ids': anchor_tokens['input_ids'],
             'anchor_attention_mask': anchor_tokens['attention_mask'],
@@ -2401,10 +2938,10 @@ class BridgePairDataset(Dataset):
 def contrastive_collate_fn(batch: List[Dict]) -> Dict[str, torch.Tensor]:
     """
     Collate function for contrastive pairs with dynamic padding.
-    
+
     Args:
         batch: List of batch samples
-        
+
     Returns:
         Batched tensors with padding
     """
@@ -2416,26 +2953,26 @@ def contrastive_collate_fn(batch: List[Dict]) -> Dict[str, torch.Tensor]:
     negative_input_ids = [item['negative_input_ids'] for item in batch]
     negative_attention_mask = [item['negative_attention_mask'] for item in batch]
     labels = [item['label'] for item in batch]
-    
+
     # Pad sequences
     def pad_sequences(sequences):
         max_len = max(len(seq) for seq in sequences)
         padded_sequences = []
         attention_masks = []
-        
+
         for seq in sequences:
             padded_seq = seq + [0] * (max_len - len(seq))
             mask = [1] * len(seq) + [0] * (max_len - len(seq))
             padded_sequences.append(padded_seq)
             attention_masks.append(mask)
-            
+
         return torch.tensor(padded_sequences), torch.tensor(attention_masks)
-    
+
     # Pad all sequences
     anchor_ids_padded, anchor_mask_padded = pad_sequences(anchor_input_ids)
     positive_ids_padded, positive_mask_padded = pad_sequences(positive_input_ids)
     negative_ids_padded, negative_mask_padded = pad_sequences(negative_input_ids)
-    
+
     return {
         'anchor_input_ids': anchor_ids_padded,
         'anchor_attention_mask': anchor_mask_padded,
@@ -2458,7 +2995,7 @@ def create_contrastive_dataloader(
 ) -> DataLoader:
     """
     Create DataLoader for contrastive learning.
-    
+
     Args:
         texts: List of text samples
         labels: List of labels
@@ -2468,7 +3005,7 @@ def create_contrastive_dataloader(
         pairs_per_sample: Pairs per sample
         shuffle: Whether to shuffle data
         num_workers: Number of worker processes
-        
+
     Returns:
         Configured DataLoader
     """
@@ -2479,7 +3016,7 @@ def create_contrastive_dataloader(
         max_length=max_length,
         pairs_per_sample=pairs_per_sample
     )
-    
+
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
@@ -2488,7 +3025,7 @@ def create_contrastive_dataloader(
         collate_fn=contrastive_collate_fn,
         pin_memory=True
     )
-    
+
     return dataloader
 
 # ============================================================================
@@ -2507,7 +3044,7 @@ def get_model_size(model: nn.Module) -> str:
     buffer_size = 0
     for buffer in model.buffers():
         buffer_size += buffer.nelement() * buffer.element_size()
-    
+
     size_all_mb = (param_size + buffer_size) / 1024**2
     return f"{size_all_mb:.2f} MB"
 
