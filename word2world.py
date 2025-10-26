@@ -1,76 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-**Word2World Social Media Platform**
-**Bridging Ideas Together**
-Authors: Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang <br>
-Version: 4.0
-Updated: October 22, 2025
-License: MIT
-"""
-
-"""
-Word2World Social Platform
+Word2World Social
 Bridging Ideas Together
-
-Authors: Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang
-Institution: Middlebury Institute of International Studies at Monterey (MIIS)
-Date: October 23, 2025
-Version: 4.0
-License: MIT
-"""
-
-# ============================================================================
-# GOOGLE COLAB SETUP
-# ============================================================================
-
-# Install required packages
-
-# Hugging Face Token Setup (for gated models like CLIP)
-from google.colab import userdata
-import os
-
-try:
-    HF_TOKEN = userdata.get('HF_TOKEN')
-    os.environ['HF_TOKEN'] = HF_TOKEN
-    print("✓ HF_TOKEN loaded from Colab Secrets")
-except:
-    print("⚠️  HF_TOKEN not found in Colab Secrets")
-    print("   Add it via the 🔑 icon in the left sidebar")
-
-# ============================================================================
-# IMPORTS
-# ============================================================================
-
-# -*- coding: utf-8 -*-
-"""Word2World.ipynb
-
-
-**Word2World Social Media Platform** <br>
-**Bridging Ideas Together** <br>
-Authors: Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang <br>
-Version: 4.0 <br>
-Updated: October 22, 2025 <br>
-License: MIT
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Word2World Social Platform
-Bridging Ideas Together
-
-Multi-Modal Hyperbolic Embeddings for Peace-Building Social Networks
 
 Features:
 - Multi-modal user representation (text + image + network + engagement)
-- Mahalanobis distance with covariance awareness
-- Hyperbolic geometry for hierarchical semantic space
-- Siamese neural network for bridge prediction
-- Secure Hugging Face token handling
+- Siamese transformer for bridge prediction
 
-Authors: Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang
-Version: 4.0
-Updated: October 22, 2025
-License: MIT
+Authors: shu bai, xiaoyue cao, jinxing chen, yunzhou dai, vieux valcin, huiyi zhang
+Institution: Middlebury Institute of International Studies at Monterey (MIIS)
+Date: October 26, 2025
 """
 
 """# Intro
@@ -122,29 +61,7 @@ f(⋅) is a scoring function calibrated for optimal bridge discovery, empiricall
 C(i,j) is an adaptive confidence weighting, reflecting both modality agreement and data robustness.
 
 This ensures content and connection recommendations forge productive cross-domain connections (“bridges”)—leveraging not only textual meaning, but also visual context and social structure—while minimizing conflict potential.
-
-# NEW SETUP & INSTALLATION
 """
-
-"""Word2World - STAP v4.0 Google Colab Setup Instructions
-=========================================================
-
-This notebook implements the STAP v4.0 (Semantic Topology-Aware Projection)
-framework for the Word2World social media platform with a "Siamese" NN for "bridge"-aware scoring.
-
-STAP v4.0 Features:
-- Multi-Modal Mahalanobis Distance for high-dimensional semantic space
-- Hyperbolic Geometry (Poincaré Ball) for low-dimensional representation
-- Contrastive Loss for niche boundary classification
-- Siamese Neural Network for bridge-aware recommendation scoring
-
-Authors: Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang
-Version: 4.0
-Date: October 19, 2025
-License: MIT
-"""
-
-
 
 # ============================================================================
 # ROBUST COVARIANCE ESTIMATION
