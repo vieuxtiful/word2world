@@ -3,8 +3,9 @@
 
 [![Version](https://img.shields.io/badge/version-4.0-blue.svg)](https://github.com/word2world/stap) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.8+-yellow.svg)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/pytorch-2.0+-red.svg)](https://pytorch.org/) [![Projects for Peace](https://img.shields.io/badge/Projects%20for%20Peace-2025-orange.svg)](https://www.projectsforpeace.org/)
 
-A $10,000 initiative funded by the *A Kathryn W. Davis Projects for Peace* by 
-Translation, Interpretation, and Localization Management (TILM) students at the
+Funding: $10,000
+Funded by: *Kathryn W. Davis Projects for Peace*
+Creators: Translation, Interpretation, and Localization Management (TILM) students at the
 Middlebury Institute of International Studies at Monterey (MIIS)
 
 **Roles:**
