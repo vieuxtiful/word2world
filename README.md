@@ -778,7 +778,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## References
+## References (Synopsis)
 
 [1] Human Rights Council. (2018). Report of the independent international fact-finding mission on Myanmar. https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/A_HRC_39_64.pdf
 
