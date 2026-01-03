@@ -3,41 +3,45 @@
 
 [![Version](https://img.shields.io/badge/version-4.0-blue.svg)](https://github.com/word2world/stap) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.8+-yellow.svg)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/pytorch-2.0+-red.svg)](https://pytorch.org/) [![Projects for Peace](https://img.shields.io/badge/Projects%20for%20Peace-2025-orange.svg)](https://www.projectsforpeace.org/)
 
-*A Projects for Peace Initiative* by 
+A $10,000 initiative funded by the *A Kathryn W. Davis Projects for Peace* by 
 Translation, Interpretation, and Localization Management (TILM) students at the
 Middlebury Institute of International Studies at Monterey (MIIS)
 
 **Authors:** Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang
+**Roles:**
+Technical Lead: Valcin, Vieux
+Engineer, Front-end: Chen, Jinxing
+Engineer, Back-end: Cao, Xiaoyue
+Project Manager: Bai, Shu
+Project Administrator: Zhang, Huiyi
+Project Administrator: Dai, Yunzhou 
 
 ---
 
 ## Overview
 
-**Word2World** is a next-generation social media platform that leverages advanced mathematical frameworks to bridge ideological divides and foster constructive dialogue. Developed as part of a **Projects for Peace** initiative at the Middlebury Institute of International Studies at Monterey, Word2World represents a paradigm shift from engagement-driven algorithms to peace-building technology.
+**Word2World** is a next-generation platform that leverages advanced mathematical frameworks to bridge ideological divides and foster constructive dialogue. Developed in part as a **Kathryn W. Davis Projects for Peace** initiative in partnership with the Middlebury Institute of International Studies at Monterey, Word2World represents a paradigm shift from engagement-driven algorithms to a promising peace-building technological solution.
 
-At its core is the **STAP v4.0 (Semantic Topology-Aware Projection)** framework, which combines multi-modal embeddings, hyperbolic geometry, manifold-aware regularization, and deep learning to identify "bridge" content that connects users with different perspectives.
+With the **STAP v4.0 (Semantic Topology-Aware Projection)** framework at its core, which amalgamates multi-modal embeddings, hyperbolic geometry, manifold-aware regularization, and deep learning to identify "bridge" content that connects users with different perspectives.
 
 ### The Problem We're Solving
 
-In 2017, Facebook's algorithms amplified hate speech that contributed to genocide in Myanmar. In 2021, social media platforms mobilized a violent insurrection at the U.S. Capitol. During the COVID-19 pandemic, algorithmic amplification of health misinformation led to at least 800 documented deaths. The pattern is clear and devastating: **social media platforms designed to maximize engagement systematically amplify conflict, polarization, and violence.**
+In 2017, Facebook's (and other social media) algorithms amplified hate speech that contributed to genocide in Myanmar [1]. In 2021, social media platforms mobilized a violent insurrection at the U.S. Capitol. During the COVID-19 pandemic, algorithmic amplification of health misinformation (i.e., "infodemics") led to at least 800 documented deaths [2]. The pattern is clear and devastating: **social media platforms designed to maximize engagement systematically amplify conflict, polarization, and violence.**
 
-Most responses to this crisis are reactive—better content moderation, fact-checking, user education. These are necessary but insufficient. They treat the symptoms, not the disease. The fundamental problem is structural: social media algorithms are optimized for engagement, and divisive content generates more engagement than bridge-building dialogue.
+Most responses to this crisis are reactive—better content moderation, fact-checking, user education, etc. These are necessary but insufficient. They treat the symptoms, not the disease. The fundamental problem is structural: social media algorithms are optimized for engagement, and divisive content generates more engagement than bridge-building dialogue.
 
 ### Our Solution
 
-**Word2World is different.** It is a social media platform designed from the ground up for peace-building, not engagement. This is not a concept—we have already built a functional prototype with over **3,000 lines of production-quality code** implementing a novel, proprietary Semantic Topology-Aware Projection (STAP) mathematical framework.
-
-**The tech works.** What is needed now is to showcase its ability to promote peace in a real-world community through our MIIS pilot deployment.
+It is a platform designed from the ground up for peace-building, not engagement. 
 
 ### What Makes STAP v4.0 Unique?
 
-Unlike traditional recommendation systems that create echo chambers, STAP v4.0 actively identifies and promotes content that:
-
+Unlike traditional recommendation systems that create echo chambers, our native STAP v4.0 architecture actively identifies and promotes content that:
 - **Validates** your existing views (Neighbors)
 - **Expands** your perspective with related but different ideas (Bridges)
 - **Challenges** you with distant viewpoints (Horizons)
 
-The system uses **five groundbreaking mathematical innovations**:
+The system uses **five (5) groundbreaking mathematical developments**:
 
 1. **Multi-Modal Mahalanobis Distance** - Combines text, images, network, and engagement data with robust covariance estimation (MCD) and low-rank approximation
 
@@ -100,9 +104,9 @@ STAP operationalizes these principles at scale. By identifying and promoting con
 
 3. **Scalable Design**: The architecture is designed from the ground up for global deployment, handling 1M+ users
 
-4. **Expert Team**: Our team combines technical expertise (AI development, localization engineering), domain knowledge (conflict resolution, peace studies), and project management skills
+4. **Expert Team**: Our team combines technical expertise (AI development, localization engineering, applied engineering), domain knowledge (conflict resolution, peace studies), and project management skills
 
-5. **Institutional Support**: MIIS provides an ideal environment with a globally-minded community and strong institutional commitment to peace-building
+5. **Institutional Support**: MIIS provides an ideal environment with a globally-minded community and strong institutional commitment
 
 6. **Urgent Need**: The evidence of social media's role in violence is overwhelming. There is a clear and pressing need for alternative models
 
@@ -112,15 +116,11 @@ STAP operationalizes these principles at scale. By identifying and promoting con
 
 The MIIS pilot will:
 
-- Deploy Word2World to the MIIS community (500+ students, faculty, staff)
+- Deploy Word2World for local MIIS assessment  (500+ students, faculty, staff)
 - Measure impact on dialogue quality, perspective-taking, and community cohesion
 - Validate the STAP framework in a real-world setting
-- Create a replicable model for other institutions
+- Create a replicable model for other organizations and institutions
 - Produce a comprehensive evaluation report and "Digital Peace-Building Toolkit"
-
-This is not just a student project. It is the beginning of a paradigm shift in how we think about digital communication and peace-building.
-
-**We are not just talking about peace—we are building the digital infrastructure for it.**
 
 ---
 
@@ -128,47 +128,47 @@ This is not just a student project. It is the beginning of a paradigm shift in h
 
 ### Core Capabilities
 
-✅ **Multi-Modal User Representation**
+**Multi-Modal User Representation**
 - Text embeddings via Sentence-BERT (384D)
 - Image embeddings via CLIP (512D)
 - Network embeddings via Node2Vec (128D)
 - Engagement embeddings via Behavioral Aggregation (32D)
 - Weighted fusion: α_text=0.54, α_image=0.18, α_network=0.18, α_engagement=0.10
 
-✅ **Advanced Distance Metrics**
+**Advanced Distance Metrics**
 - **Robust Mahalanobis distance** with MCD (Minimum Covariance Determinant)
 - **Low-rank + diagonal approximation** for 97% memory reduction
 - **Hyperbolic distance** in Poincaré ball with Taylor approximation
 - **Contrastive loss** with MoCo for boundary classification
 - **Confidence scoring** for coordinate reliability
 
-✅ **Manifold-Aware Regularization (New in v4.0)**
+**Manifold-Aware Regularization (New in v4.0)**
 - **Curvature-sensitive gradient regularizer** (L_curv): Prevents exploding gradients near boundary
 - **Taylor consistency penalty** (L_jac): Maintains geometric fidelity
 - **Manifold conformality regularizer** (L_conf): Preserves conformal structure
 - **Contrastive radius margin** (L_rad): Enhances hierarchical clustering
 - **Manifold entropy regularizer** (L_entropy): Prevents mode collapse
 
-✅ **Advanced Contrastive Learning (New in v4.0)**
+**Advanced Contrastive Learning (New in v4.0)**
 - **MoCo (Momentum Contrast)** with queue-based negative sampling
 - **Hard negative mining** for robust boundary detection
 - **Hyperbolic triplet loss** for hierarchical embeddings
 - **Attention-based Siamese networks** for bridge prediction
 
-✅ **Intelligent Recommendation System**
+**Intelligent Recommendation System**
 - Three-tier recommendations: Neighbors, Bridges, Horizons
 - Bridge-aware scoring via Siamese neural networks
 - Real-time updates with incremental learning
 - O(log n) nearest neighbor search via HNSW
 
-✅ **Scalable Architecture**
+**Scalable Architecture**
 - Handles 1M+ users
 - Incremental covariance updates
 - Efficient diagonal approximation option
 - GPU acceleration for Siamese inference
 - Configurable precision/performance tradeoffs
 
-✅ **Research-Backed Design**
+**Research-Backed Design**
 - Addresses pluralistic ignorance
 - Mitigates spiral of silence
 - Promotes intellectual humility
@@ -196,7 +196,7 @@ d_M(x_i, x_j) = √((x_i - x_j)ᵀ Σ⁻¹ (x_i - x_j))
 
 where:
 - `Σ` is the **robust covariance matrix** estimated via Minimum Covariance Determinant (MCD)
-- Low-rank approximation: `Σ ≈ U_k U_kᵀ + D` for 97% memory reduction
+- Low-rank approximation: `Σ ≈ U_k U_kᵀ + D` (achieves 97% memory reduction)
 - `Σ⁻¹` is computed via Cholesky decomposition for efficiency
 - Diagonal approximation available for large-scale systems
 
@@ -733,7 +733,7 @@ gunicorn -w 4 -b 0.0.0.0:8000 app:app
 
 ## Contributing
 
-We welcome contributions from developers, researchers, and peace-builders!
+We welcome contributions from developers, researchers, and inspired peace-builders!
 
 ### How to Contribute
 
@@ -763,19 +763,26 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 
 - **Project Website:** [Coming Soon]
-- **Email:** [Your Email]
-- **GitHub Issues:** [https://github.com/word2world/stap/issues](https://github.com/word2world/stap/issues)
+- **Email:** Valcin, Vieux - Technical Lead, Full-Stack [vvalcin@middlebury.edu]
 
 ---
 
 ## Acknowledgments
 
-- **Projects for Peace** - Funding opportunity through the Davis Projects for Peace program
+- **Kathryn W. Davis Projects for Peace Committee** - Funding opportunity through the Davis Projects for Peace program
 - **Middlebury Institute of International Studies** - Institutional support and resources
 - **Sentence Transformers** - Pre-trained models for semantic embeddings
 - **OpenAI CLIP** - Vision-language models
 - **HNSW Library** - Efficient nearest neighbor search
 - **Open Source Community** - Countless tools and libraries that made this possible
+
+---
+
+## References
+
+[1] Human Rights Council. (2018). Report of the independent international fact-finding mission on Myanmar. https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/A_HRC_39_64.pdf
+
+[2] Islam, M. S., Sarkar, T., Khan, S. H., Mostofa Kamal, A. H., Hasan, S. M. M., Kabir, A., Yeasmin, D., Islam, M. A., Amin Chowdhury, K. I., Anwar, K. S., Chughtai, A. A., & Seale, H. (2020). COVID-19-Related Infodemic and Its Impact on Public Health: A Global Social Media Analysis. The American journal of tropical medicine and hygiene, 103(4), 1621–1629. https://doi.org/10.4269/ajtmh.20-0812
 
 ---
 
