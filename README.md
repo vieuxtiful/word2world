@@ -22,7 +22,7 @@ With the **STAP v4.0 (Semantic Topology-Aware Projection)** framework at its cor
 
 ### The Problem We're Solving
 
-In 2017, Facebook's (and other social media) algorithms amplified hate speech that contributed to genocide in Myanmar [1]. In 2021, social media platforms mobilized a violent insurrection at the U.S. Capitol [2]. During the COVID-19 pandemic, algorithmic amplification of health misinformation (i.e., "infodemics") led to at least 800 documented deaths [3]. The pattern is clear and devastating: **social media platforms designed to maximize engagement systematically amplify conflict, polarization, and violence.**
+In 2017, Facebook's (and other social media) algorithms amplified hate speech that contributed to genocide in Myanmar [1]. In 2021, social media platforms mobilized a violent insurrection at the U.S. Capitol [2]. During the COVID-19 pandemic, algorithmic amplification of health misinformation (i.e., "infodemics") led to at least 800 documented deaths [3]. The pattern is evident: **social media platform designed to maximize engagement systematically amplify conflict, polarization, and violence.**
 
 Most responses to this crisis are reactive—better content moderation, fact-checking, user education, etc. These are necessary but insufficient. They treat the symptoms, not the disease. The fundamental problem is structural: social media algorithms are optimized for engagement, and divisive content generates more engagement than bridge-building dialogue.
 
