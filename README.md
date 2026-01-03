@@ -5,11 +5,12 @@
 
 Funding: $10,000
 Funded by: *Kathryn W. Davis Projects for Peace*
+
 Creators: Translation, Interpretation, and Localization Management (TILM) students at the
 Middlebury Institute of International Studies at Monterey (MIIS)
 
 **Roles:**
-Valcin, Vieux (Technical Lead), Chen, Jinxing, Cao, Xiaoyue, Bai, Shu, Zhang, Huiyi, Dai, Yunzhou  
+Valcin, Vieux (Technical Lead), Chen, Jinxing, Cao, Xiaoyue, Bai, Shu, Zhang, Huiyi, and Dai, Yunzhou  
 
 ---
 
