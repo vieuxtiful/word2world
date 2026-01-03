@@ -7,14 +7,8 @@ A $10,000 initiative funded by the *A Kathryn W. Davis Projects for Peace* by
 Translation, Interpretation, and Localization Management (TILM) students at the
 Middlebury Institute of International Studies at Monterey (MIIS)
 
-**Authors:** Shu Bai, Xiaoyue Cao, Jinxing Chen, Yunzhou Dai, Vieux Valcin, Huiyi Zhang
 **Roles:**
-Technical Lead: Valcin, Vieux
-Engineer, Front-end: Chen, Jinxing
-Engineer, Back-end: Cao, Xiaoyue
-Project Manager: Bai, Shu
-Project Administrator: Zhang, Huiyi
-Project Administrator: Dai, Yunzhou 
+Valcin, Vieux (Technical Lead), Chen, Jinxing, Cao, Xiaoyue, Bai, Shu, Zhang, Huiyi, Dai, Yunzhou  
 
 ---
 
