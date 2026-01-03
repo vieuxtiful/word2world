@@ -14,7 +14,9 @@ Valcin, Vieux (Technical Lead), Chen, Jinxing, Cao, Xiaoyue, Bai, Shu, Zhang, Hu
 
 ## Overview
 
-**Word2World** is a next-generation platform that leverages advanced mathematical frameworks to bridge ideological divides and foster constructive dialogue. Developed in part as a **Kathryn W. Davis Projects for Peace** initiative in partnership with the Middlebury Institute of International Studies at Monterey, Word2World represents a paradigm shift from engagement-driven algorithms to a promising peace-building technological solution.
+**Word2World** is a next-generation platform that leverages advanced mathematical frameworks to bridge ideological divides and foster constructive dialogue. 
+
+Developed in part as a **Kathryn W. Davis Projects for Peace** initiative in partnership with the Middlebury Institute of International Studies at Monterey, Word2World represents a paradigm shift from engagement-driven algorithms to a promising peace-building technological solution.
 
 With the **STAP v4.0 (Semantic Topology-Aware Projection)** framework at its core, which amalgamates multi-modal embeddings, hyperbolic geometry, manifold-aware regularization, and deep learning to identify "bridge" content that connects users with different perspectives.
 
