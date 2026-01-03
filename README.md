@@ -22,7 +22,7 @@ With the **STAP v4.0 (Semantic Topology-Aware Projection)** framework at its cor
 
 ### The Problem We're Solving
 
-In 2017, Facebook's (and other social media) algorithms amplified hate speech that contributed to genocide in Myanmar [1]. In 2021, social media platforms mobilized a violent insurrection at the U.S. Capitol. During the COVID-19 pandemic, algorithmic amplification of health misinformation (i.e., "infodemics") led to at least 800 documented deaths [2]. The pattern is clear and devastating: **social media platforms designed to maximize engagement systematically amplify conflict, polarization, and violence.**
+In 2017, Facebook's (and other social media) algorithms amplified hate speech that contributed to genocide in Myanmar [1]. In 2021, social media platforms mobilized a violent insurrection at the U.S. Capitol [2]. During the COVID-19 pandemic, algorithmic amplification of health misinformation (i.e., "infodemics") led to at least 800 documented deaths [3]. The pattern is clear and devastating: **social media platforms designed to maximize engagement systematically amplify conflict, polarization, and violence.**
 
 Most responses to this crisis are reactive—better content moderation, fact-checking, user education, etc. These are necessary but insufficient. They treat the symptoms, not the disease. The fundamental problem is structural: social media algorithms are optimized for engagement, and divisive content generates more engagement than bridge-building dialogue.
 
@@ -778,7 +778,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 [1] Human Rights Council. (2018). Report of the independent international fact-finding mission on Myanmar. https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/A_HRC_39_64.pdf
 
-[2] Islam, M. S., Sarkar, T., Khan, S. H., Mostofa Kamal, A. H., Hasan, S. M. M., Kabir, A., Yeasmin, D., Islam, M. A., Amin Chowdhury, K. I., Anwar, K. S., Chughtai, A. A., & Seale, H. (2020). COVID-19-Related Infodemic and Its Impact on Public Health: A Global Social Media Analysis. The American journal of tropical medicine and hygiene, 103(4), 1621–1629. https://doi.org/10.4269/ajtmh.20-0812
+[2] American Psychological Association. (2022). Group psychology and the January 6 insurrection. Apa.org. https://www.apa.org/pubs/highlights/spotlight/issue-247
+
+[3] Islam, M. S., Sarkar, T., Khan, S. H., Mostofa Kamal, A. H., Hasan, S. M. M., Kabir, A., Yeasmin, D., Islam, M. A., Amin Chowdhury, K. I., Anwar, K. S., Chughtai, A. A., & Seale, H. (2020). COVID-19-Related Infodemic and Its Impact on Public Health: A Global Social Media Analysis. The American journal of tropical medicine and hygiene, 103(4), 1621–1629. https://doi.org/10.4269/ajtmh.20-0812
 
 ---
 
