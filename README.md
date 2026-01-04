@@ -67,6 +67,22 @@ The system uses **five (5) groundbreaking mathematical developments**:
 
 ---
 
+## Accolades 
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
+<img src="images/manus-ai.png" width="10%" />
+
+Open Presentation: Manus AI
+
+Panel
+
+-   Lyman, Parker
+-   Tan, Michelle
+-   Li, Lantao
+
+---
+
 ## Table of Contents
 
 <img src="images/glassmorphism-dove.svg" width="10%" align="right" />
