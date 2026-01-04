@@ -1,17 +1,17 @@
-# Word2World
-**Bridging Ideas Together**
-
-[![Version](https://img.shields.io/badge/version-4.0-blue.svg)](https://github.com/word2world/stap) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.8+-yellow.svg)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/pytorch-2.0+-red.svg)](https://pytorch.org/) [![Projects for Peace](https://img.shields.io/badge/Projects%20for%20Peace-2025-orange.svg)](https://www.projectsforpeace.org/)
-
 <img src="images/w2w-digital-logo-new.gif" width="85%" />
 
+# Word2World: **Bridging Ideas Together**
+
+[![Version](https://img.shields.io/badge/version-4.0-blue.svg)](https://github.com/word2world/stap) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.8+-yellow.svg)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/pytorch-2.0+-red.svg)](https://pytorch.org/) [![Projects for Peace](https://img.shields.io/badge/Projects%20for%20Peace-2025-orange.svg)](https://www.projectsforpeace.org/) <img src="images/hugging-face-logo.png" width="12%" />
 Funded by: 
 
-<img src="images/p4p-logo.png" width="30%" />
+<img src="images/middlebury-seal.png" width="10%" /> <img src="images/middlebury-institute-seal.png" width="9%" hspace="40" /> <img src="images/p4p-logo.png" width="30%" hspace="3" />
 
-*Kathryn W. Davis Projects for Peace*
+The *Kathryn W. Davis Projects for Peace* in partnership with the Middlebury Institute.
 
 Funding: $10,000
+
+--------------------------------------------------------- 
 
 **Authors:**
 -   Valcin, Vieux (Technical Lead)
@@ -70,7 +70,7 @@ It is a platform designed from the ground up for peace-building, not engagement.
 
 ### What Makes STAP v4.0 Unique?
 
-Unlike traditional recommendation systems that create echo chambers (e.g., faiss), our native STAP v4.0 architecture actively identifies and promotes content that:
+Unlike traditional recommendation systems that create echo chambers (e.g., Facebook AI similarity search, faiss), our native STAP v4.0 architecture actively identifies and promotes content that:
 - **Validates** your existing views (Neighbors)
 - **Expands** your perspective with related but different ideas (Bridges)
 - **Challenges** you with distant viewpoints (Horizons)
