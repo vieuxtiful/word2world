@@ -5,12 +5,13 @@
 
 <img src="images/w2w-digital-logo-new.gif" width="85%" />
 
-Funding: $10,000
 Funded by: 
 
-<img src="images/p4p-logo.png" width="90%" />
+<img src="public/miis-logo-rev.svg" width="30%"> <img src="images/p4p-logo.png" width="30%" />
 
 *Kathryn W. Davis Projects for Peace*
+
+Funding: $10,000
 
 **Authors:**
 -   Valcin, Vieux (Technical Lead)
