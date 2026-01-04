@@ -7,7 +7,7 @@
 
 Funded by: 
 
-<img src="public/miis-logo-rev.svg" width="30%"> <img src="images/p4p-logo.png" width="30%" />
+<img src="images/p4p-logo.png" width="30%" />
 
 *Kathryn W. Davis Projects for Peace*
 
@@ -20,6 +20,7 @@ Funding: $10,000
 -   Cao, Xiaoyue
 -   Dai, Yunzhou
 -   Zhang, Huiyi  
+
 Translation and Localization Management (TLM) students at the
 Middlebury Institute of International Studies at Monterey (MIIS)
 
@@ -45,7 +46,7 @@ It is a platform designed from the ground up for peace-building, not engagement.
 
 ### What Makes STAP v4.0 Unique?
 
-Unlike traditional recommendation systems that create echo chambers, our native STAP v4.0 architecture actively identifies and promotes content that:
+Unlike traditional recommendation systems that create echo chambers (e.g., faiss), our native STAP v4.0 architecture actively identifies and promotes content that:
 - **Validates** your existing views (Neighbors)
 - **Expands** your perspective with related but different ideas (Bridges)
 - **Challenges** you with distant viewpoints (Horizons)
@@ -81,9 +82,9 @@ The system uses **five (5) groundbreaking mathematical developments**:
 
 ---
 
-## Projects for Peace Mission
+## Projects for Peace
 
-### Building the Digital Infrastructure for Peace
+### Building the Infrastructure
 
 The current state of social media is not inevitable. The algorithms that amplify hate, the echo chambers that deepen division, and the viral spread of misinformation are all the result of design choices—choices that prioritized engagement over understanding, and profit over peace.
 
@@ -91,7 +92,7 @@ The current state of social media is not inevitable. The algorithms that amplify
 
 We have built the foundation of a platform that identifies and promotes common ground. We have implemented algorithms that bridge divides rather than deepen them. We have created a system that learns and improves continuously based on user feedback.
 
-### How Word2World Promotes Peace
+### Birth of Word2World
 
 Traditional social media creates echo chambers by showing users content that confirms their existing beliefs. This deepens polarization. Word2World systematically exposes users to perspectives that are different enough to expand their worldview, but similar enough to be comprehensible and non-threatening.
 
@@ -105,7 +106,7 @@ Research in conflict resolution and social psychology supports this approach:
 
 STAP operationalizes these principles at scale. By identifying and promoting content that bridges divides, Word2World creates the conditions for constructive dialogue and mutual understanding.
 
-### Why This Project Will Succeed
+### Unique Factors of Word2World
 
 1. **Proven Technology**: We have built a sophisticated, functional prototype with over **3,000 lines** of production-quality code implementing STAP v4.0
 
@@ -121,268 +122,73 @@ STAP operationalizes these principles at scale. By identifying and promoting con
 
 7. **Replicable Model**: The "Digital Peace-Building Toolkit" will enable other institutions and organizations to adopt Word2World, multiplying impact
 
-### MIIS Pilot Deployment
+---
 
-The MIIS pilot will:
+## Features of Word2World
 
-- Deploy Word2World for local MIIS assessment  (500+ students, faculty, staff)
-- Measure impact on dialogue quality, perspective-taking, and community cohesion
-- Validate the STAP framework in a real-world setting
-- Create a replicable model for other organizations and institutions
-- Produce a comprehensive evaluation report and "Digital Peace-Building Toolkit"
+**Core Capabilities**
+
+- Multi-modal embeddings: Fuses text, image, social network, and behavioral data into unified user representations
+- Advanced distance metrics: Implements robust Mahalanobis, hyperbolic, and contrastive learning for precise similarity measurement
+- Scalable design: Efficient architecture supporting 1M+ users with real-time updates
+
+**STAP v4.0 Technique**
+- Manifold-aware regularization: Novel techniques for stable hyperbolic embeddings and geometric fidelity
+- Enhanced contrastive learning: Momentum Contrast (MoCo) with hard negative mining and hyperbolic triplet loss
+- Intelligent recommendations: Three-tier system (Neighbors/Bridges/Horizons) with bridge-aware scoring
+
+**Research-Backed Benefits**
+- Reduces polarization and pluralistic ignorance
+- Promotes diverse connections and intellectual humility
+- Mitigates echo chambers through bridge recommendations
+
+**Performance Optimizations**
+- 97% memory reduction via low-rank approximations
+- O(log n) search with HNSW indexing
+- GPU acceleration and configurable precision tradeoffs
 
 ---
 
-## Features
+## Mathematical Framework (Overview)
 
-### Core Capabilities
+Word2World uses a **two-stage** geometric pipeline to map users into a semantic space and predict constructive “bridges” between them.
 
-**Multi-Modal User Representation**
-- Text embeddings via Sentence-BERT (384D)
-- Image embeddings via CLIP (512D)
-- Network embeddings via Node2Vec (128D)
-- Engagement embeddings via Behavioral Aggregation (32D)
-- Weighted fusion: α_text=0.54, α_image=0.18, α_network=0.18, α_engagement=0.10
+### 1. Multi-Modal High-Dimensional Space
 
-**Advanced Distance Metrics**
-- **Robust Mahalanobis distance** with MCD (Minimum Covariance Determinant)
-- **Low-rank + diagonal approximation** for 97% memory reduction
-- **Hyperbolic distance** in Poincaré ball with Taylor approximation
-- **Contrastive loss** with MoCo for boundary classification
-- **Confidence scoring** for coordinate reliability
+Users are first represented in a 1056D multi-modal space that fuses text, image, network, and engagement embeddings with learned modality weights.  
+A robust Mahalanobis distance with MCD-based covariance and a low-rank-plus-diagonal approximation provides outlier-resistant, memory-efficient similarity computation at scale (≈97% covariance memory reduction and 1M+ users supported).
 
-**Manifold-Aware Regularization (New in v4.0)**
-- **Curvature-sensitive gradient regularizer** (L_curv): Prevents exploding gradients near boundary
-- **Taylor consistency penalty** (L_jac): Maintains geometric fidelity
-- **Manifold conformality regularizer** (L_conf): Preserves conformal structure
-- **Contrastive radius margin** (L_rad): Enhances hierarchical clustering
-- **Manifold entropy regularizer** (L_entropy): Prevents mode collapse
+High-dimensional neighbor probabilities \(P(i,j)\) are defined with a locally adaptive bandwidth (perplexity-based), forming the target neighborhood structure that the low-dimensional embedding must preserve.
 
-**Advanced Contrastive Learning (New in v4.0)**
-- **MoCo (Momentum Contrast)** with queue-based negative sampling
-- **Hard negative mining** for robust boundary detection
-- **Hyperbolic triplet loss** for hierarchical embeddings
-- **Attention-based Siamese networks** for bridge prediction
+### 2. Hyperbolic Low-Dimensional Space
 
-**Intelligent Recommendation System**
-- Three-tier recommendations: Neighbors, Bridges, Horizons
-- Bridge-aware scoring via Siamese neural networks
-- Real-time updates with incremental learning
-- O(log n) nearest neighbor search via HNSW
+The high-dimensional representation is projected into a 32D Poincaré ball, where hyperbolic distance captures ideological hierarchies and separates mainstream vs. niche/extreme regions by radius.  
+Low-dimensional connection probabilities \(Q(i,j)\) follow a heavy‑tailed distribution (Student‑t–style / \(1 + a d_H^{2b}\)) to better separate dissimilar users and avoid crowding.
 
-**Scalable Architecture**
-- Handles 1M+ users
-- Incremental covariance updates
-- Efficient diagonal approximation option
-- GPU acceleration for Siamese inference
-- Configurable precision/performance tradeoffs
+The STAP objective minimizes a cross‑entropy divergence between \(P\) and \(Q\), augmented with contrastive terms that pull high‑dimensional neighbors together and push non‑neighbors apart, using Riemannian gradient descent on the manifold.
 
-**Research-Backed Design**
-- Addresses pluralistic ignorance
-- Mitigates spiral of silence
-- Promotes intellectual humility
-- Reduces polarization
+### 3. Manifold-Aware Regularization
 
----
+To stabilize training in hyperbolic space and preserve geometry, STAP v4.0 adds a set of manifold‑aware regularizers:
 
-## Mathematical Framework
+- Curvature‑sensitive gradient scaling to prevent exploding/vanishing gradients near the boundary.  
+- Taylor-consistency and conformality penalties to keep approximate distances and gradients aligned with true hyperbolic geometry.  
+- Radial margin and angular entropy terms to encourage clean hierarchical structure (radius) and diverse directions (avoid mode collapse).
 
-### High-Dimensional Space: Multi-Modal Mahalanobis Distance
+These terms are combined in an integrated objective with tuned weights \(\alpha, \beta, \gamma\), as detailed in the technical paper.
 
-**Objective:** Capture semantic similarity across multiple modalities while accounting for feature correlations.
+### 4. Contrastive Learning in Hyperbolic Space
 
-**Multi-Modal Fusion:**
+A MoCo-style momentum contrastive setup maintains a memory bank of hard negatives in the hyperbolic space, sharpening boundaries between semantic clusters.  
+A hyperbolic triplet loss further enforces geodesic margins between anchor–positive (same cluster) and anchor–negative (different cluster) pairs, improving discrimination of “bridge” users at cluster interfaces.
 
-```
-x_i^(multimodal) = [α_text · x_i^(text), α_image · x_i^(image), α_network · x_i^(network), α_engagement · x_i^(engagement)]
-```
+### 5. Siamese Network for Bridge Prediction
 
-**Mahalanobis Distance:**
+On top of the hyperbolic embeddings, a Siamese MLP takes \([y_i, y_j]\) plus a compact context vector (engagement, sentiment, openness, history) and outputs the probability that a recommended connection will lead to a constructive interaction.  
+The final recommendation score combines semantic distance, confidence, and predicted bridge success to rank Neighbors, Bridges, and Horizons.
 
-```
-d_M(x_i, x_j) = √((x_i - x_j)ᵀ Σ⁻¹ (x_i - x_j))
-```
+_For full mathematical definitions, proofs, and ablation results, see the accompanying technical paper `DRAFT-Word2World-Technical-Paper-ver.-24-Dec-2025` in this repository._
 
-where:
-- `Σ` is the **robust covariance matrix** estimated via Minimum Covariance Determinant (MCD)
-- Low-rank approximation: `Σ ≈ U_k U_kᵀ + D` (achieves 97% memory reduction)
-- `Σ⁻¹` is computed via Cholesky decomposition for efficiency
-- Diagonal approximation available for large-scale systems
-
-**High-Dimensional Connection Probability:**
-
-```
-P(i,j) = exp(-d_M(x_i, x_j)² / (2σ_i²))
-```
-
-where `σ_i` is locally adaptive bandwidth determined by binary search to achieve target perplexity.
-
----
-
-### Low-Dimensional Space: Hyperbolic Geometry
-
-**Objective:** Embed users in a curved space that naturally represents hierarchical semantic structure.
-
-**Poincaré Ball Model:**
-
-```
-B^d = {y ∈ ℝ^d : ||y|| < 1}
-```
-
-**Hyperbolic Distance:**
-
-```
-d_H(y_i, y_j) = arcosh(1 + 2||y_i - y_j||² / ((1 - ||y_i||²)(1 - ||y_j||²)))
-```
-
-**Properties:**
-- Exponential volume growth → captures hierarchies
-- Moderate views near center (||y|| ≈ 0)
-- Extreme views near boundary (||y|| → 1)
-- Natural tree structure for ideological space
-
-**Low-Dimensional Connection Probability:**
-
-```
-Q(i,j) = 1 / (1 + a·d_H(y_i, y_j)^(2b))
-```
-
-where `a = 1.577` and `b = 0.895` define a heavy-tailed distribution for better separation.
-
----
-
-### Robust Covariance Estimation (v4.0)
-
-**Objective:** Provide outlier-resistant distance computation for noisy social media data.
-
-**Minimum Covariance Determinant (MCD):**
-
-```
-H* = argmin_{H⊆{1,...,N}, |H|=h} det(Σ_H)
-```
-
-where `h = ⌊(N+d+1)/2⌋` is the minimum support fraction.
-
-**Low-Rank Decomposition:**
-
-```
-Σ_MCD = U Λ Uᵀ  (via SVD)
-Σ ≈ U_k U_kᵀ + D  (low-rank + diagonal)
-```
-
-where `k = ⌈√d⌉` (default) balances accuracy and efficiency.
-
-**Benefits:**
-- **Outlier Resistance**: Automatically downweights spam, bots, extreme users
-- **Memory Efficiency**: 97% reduction (8.9 MB → 0.27 MB for d=1056)
-- **Computational Speed**: 30× faster distance computation vs full covariance
-- **Scalability**: Handles 1M+ users without degradation
-
----
-
-### Manifold-Aware Regularization (v4.0)
-
-**Integrated Objective Function:**
-
-```
-L_total = L_STAP + α·L_contrast + β·L_boundary + γ(L_curv + L_jac + L_conf + L_rad + L_entropy)
-```
-
-**Five Regularizers:**
-
-1. **Curvature-Sensitive Gradient (L_curv)**
-   ```
-   L_curv = (1/N) Σ_i ‖∇_y_i L_STAP‖² · (1 - ‖y_i‖²)⁻²
-   ```
-   Prevents exploding gradients near boundary via metric tensor scaling.
-
-2. **Taylor Consistency Penalty (L_jac)**
-   ```
-   L_jac = (1/N²) Σ_i Σ_j ‖d_Hyperbolic(y_i, y_j) - d_Taylor(y_i, y_j)‖²
-   ```
-   Maintains geometric fidelity with approximate distance calculations.
-
-3. **Manifold Conformality (L_conf)**
-   ```
-   L_conf = (1/N) Σ_i ‖y_i‖² · ‖∇_y_i L_STAP‖²
-   ```
-   Preserves conformal structure of Poincaré ball.
-
-4. **Contrastive Radius Margin (L_rad)**
-   ```
-   L_rad = (1/|P|) Σ_(i,j)∈P max(0, ‖y_i‖ - ‖y_j‖ + m_rad)
-   ```
-   Enhances hierarchical clustering via radial positioning.
-
-5. **Manifold Entropy (L_entropy)**
-   ```
-   L_entropy = -(1/N) Σ_i Σ_k p_k(y_i) log p_k(y_i)
-   ```
-   Prevents mode collapse, ensures diverse angular distribution.
-
-**Hyperparameters:** α = 0.5, β = 0.3, γ = 0.1, with individual weights w_curv = 0.3, w_jac = 0.25, w_conf = 0.2, w_rad = 0.15, w_entropy = 0.1.
-
----
-
-### Contrastive Learning (v4.0)
-
-**MoCo (Momentum Contrast):**
-
-```
-L_MoCo = -log(exp(q·k+ / τ) / (exp(q·k+ / τ) + Σ_k- exp(q·k- / τ)))
-```
-
-where:
-- `q` = query embedding
-- `k+` = positive key (similar user)
-- `k-` = negative keys from queue (dissimilar users)
-- `τ` = temperature parameter
-
-**Benefits:**
-- Large, consistent dictionary of negatives (K=4096)
-- Momentum encoder for stable keys
-- Hard negative mining for robust boundaries
-
-**Hyperbolic Triplet Loss:**
-
-```
-L_triplet = max(0, d_H(anchor, positive) - d_H(anchor, negative) + margin)
-```
-
-Enforces hierarchical structure in hyperbolic space.
-
----
-
-### Siamese Neural Network for Bridge Prediction
-
-**Architecture:**
-
-```
-Input: [y_i, y_j, context_vector] → MLP → P(bridge_success)
-```
-
-**Context Vector (32D):**
-- User engagement patterns (8D)
-- Sentiment alignment (4D)
-- Openness to new ideas (4D)
-- Historical bridge acceptance (4D)
-- Topic diversity (4D)
-- Interaction history (8D)
-
-**Attention Mechanism (New in v4.0):**
-
-```
-attention_weights = softmax(W_q·y_i ⊙ W_k·y_j)
-attended_features = attention_weights ⊙ concat(y_i, y_j)
-```
-
-Focuses on semantically relevant dimensions for bridge prediction.
-
-**Training:**
-- Positive examples: Accepted bridge recommendations
-- Negative examples: Rejected or ignored recommendations
-- Loss: Binary cross-entropy
-- Optimizer: Adam with learning rate scheduling
 
 ---
 
@@ -778,12 +584,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
+<img src="images/miis-logo-rev.svg" width="30%">
+
 - **Kathryn W. Davis Projects for Peace Committee** - Funding opportunity through the Davis Projects for Peace program
 - **Middlebury Institute of International Studies** - Institutional support and resources
 - **Sentence Transformers** - Pre-trained models for semantic embeddings
 - **OpenAI CLIP** - Vision-language models
-- **HNSW Library** - Efficient nearest neighbor search
-- **Open Source Community** - Countless tools and libraries that made this possible
+- **HNSW Lib** - NN search
+- **Open Source Community** - The auxiliary tools and libraries 
 
 ---
 
