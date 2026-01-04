@@ -3,21 +3,18 @@
 
 [![Version](https://img.shields.io/badge/version-4.0-blue.svg)](https://github.com/word2world/stap) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.8+-yellow.svg)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/pytorch-2.0+-red.svg)](https://pytorch.org/) [![Projects for Peace](https://img.shields.io/badge/Projects%20for%20Peace-2025-orange.svg)](https://www.projectsforpeace.org/)
 
+<img src="images/w2w-digital-logo.gif" width="85%" />
+
 Funding: $10,000
 Funded by: *Kathryn W. Davis Projects for Peace*
 
 **Authors:**
-Valcin, Vieux (Technical Lead)
-
-Chen, Jinxing
-
-Cao, Xiaoyue
-
-Bai, Shu
-
-Zhang, Huiyi
-
-Dai, Yunzhou  
+-   Valcin, Vieux (Technical Lead)
+-   Bai, Shu
+-   Chen, Jinxing
+-   Cao, Xiaoyue
+-   Dai, Yunzhou
+-   Zhang, Huiyi  
 Translation and Localization Management (TLM) students at the
 Middlebury Institute of International Studies at Monterey (MIIS)
 
