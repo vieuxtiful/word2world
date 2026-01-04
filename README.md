@@ -26,7 +26,9 @@ Middlebury Institute of International Studies at Monterey (MIIS)
 
 ---
 
-<img src="images/Digital Logo (v2).svg" width="10%" /> ## Overview
+## Overview 
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
 **Word2World** is a next-generation platform that leverages advanced mathematical frameworks to bridge ideological divides and foster constructive dialogue. 
 
@@ -67,6 +69,8 @@ The system uses **five (5) groundbreaking mathematical developments**:
 
 ## Table of Contents
 
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
 - [Projects for Peace Mission](#projects-for-peace-mission)
 - [Features](#features)
 - [Mathematical Framework](#mathematical-framework)
@@ -83,6 +87,8 @@ The system uses **five (5) groundbreaking mathematical developments**:
 ---
 
 ## Projects for Peace
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
 ### Building the Infrastructure
 
@@ -126,6 +132,8 @@ STAP operationalizes these principles at scale. By identifying and promoting con
 
 ## Features of Word2World
 
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
 **Core Capabilities**
 
 - Multi-modal embeddings: Fuses text, image, social network, and behavioral data into unified user representations
@@ -150,6 +158,8 @@ STAP operationalizes these principles at scale. By identifying and promoting con
 ---
 
 ## Mathematical Framework (Overview)
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
 Word2World uses a **two-stage** geometric pipeline to map users into a semantic space and predict constructive “bridges” between them.
 
@@ -194,6 +204,8 @@ _For full mathematical definitions, proofs, and ablation results, see the accomp
 
 ## Installation
 
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
 ### Prerequisites
 
 - Python 3.8+
@@ -225,6 +237,8 @@ os.environ['HF_TOKEN'] = "your_huggingface_token_here"
 ---
 
 ## Quick Start
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
 ### Basic Usage
 
@@ -295,6 +309,8 @@ print(f"Horizons: {recommendations['horizons']}")
 
 ## Configuration
 
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
 ### STAPv4Config
 
 ```python
@@ -357,6 +373,8 @@ cov_config = CovarianceConfig(
 ---
 
 ## API Reference
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
 ### STAPv4PreprocessingLayer
 
@@ -448,6 +466,8 @@ precision = estimator.get_precision() -> np.ndarray
 
 ## Performance
 
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
 ### Computational Complexity
 
 | Operation | Complexity | Time (1000 users) |
@@ -483,6 +503,8 @@ precision = estimator.get_precision() -> np.ndarray
 ---
 
 ## Deployment
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
 ### Local Development
 
@@ -529,6 +551,8 @@ gunicorn -w 4 -b 0.0.0.0:8000 app:app
 
 ## Research
 
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
 ### Publications
 
 - **Technical Paper:** "Multi-Modal Hyperbolic Embeddings for Peace-Building Social Networks" (2025)
@@ -547,6 +571,8 @@ gunicorn -w 4 -b 0.0.0.0:8000 app:app
 ---
 
 ## Contributing
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
 We welcome contributions from developers, researchers, and inspired peace-builders!
 
@@ -583,8 +609,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 ## Acknowledgments
-
-<img src="images/miis-logo-rev.svg" width="30%">
 
 - **Kathryn W. Davis Projects for Peace Committee** - Funding opportunity through the Davis Projects for Peace program
 - **Middlebury Institute of International Studies** - Institutional support and resources
