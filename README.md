@@ -6,7 +6,7 @@
 
 Funded by: 
 
-<img src="images/middlebury-seal.png" width="10%" /> <img src="images/middlebury-institute-seal.png" width="9%" hspace="40" /> <img src="images/p4p-logo.png" width="30%" hspace="3" />
+<img src="images/middlebury-seal.png" width="8%" /> <img src="images/middlebury-institute-seal.png" width="7%" hspace="40" /> <img src="images/p4p-logo.png" width="20%" hspace="3" />
 
 The *Kathryn W. Davis Projects for Peace* (in partnership with the Middlebury Institute).
 
@@ -27,9 +27,11 @@ Middlebury Institute of International Studies at Monterey (MIIS)
 
 ## Accolades 
 
-<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+<div align="center">
 
 <img src="images/metaxmanus-ai-2.png" width="55%" />
+
+</div>
 
 Invitation: Manus AI - Open Presentation
 
@@ -153,7 +155,7 @@ STAP operationalizes these principles at scale. By identifying and promoting con
 
 ---
 
-## Features of Word2World
+## Features
 
 <img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
@@ -654,9 +656,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**⭐ Star this repository if you believe social media can be a force for peace ⭐**
+<img src="images/miis-logo-rev.svg" width="35%" />
 
 Made with ❤️ for a more peaceful world
 
+Team W2W 🕊
 </div>
 
