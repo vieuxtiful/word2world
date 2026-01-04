@@ -24,6 +24,26 @@ Funding: $10,000
 Translation and Localization Management (TLM) students at the
 Middlebury Institute of International Studies at Monterey (MIIS)
 
+## Accolades 
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
+<img src="images/metaxmanus-ai.png" width="30%" />
+
+Invitation: Open Presentation with Manus AI (Meta)
+
+Date: September 22, 2025
+
+Presentation Panel:
+
+-   Lyman, Parker (Chief of Staff)
+-   Li, Lantao (GTM)
+-   Tan, Michelle 
+
+Presenter: 
+
+Valcin, Vieux (Technical Lead)
+
 ---
 
 ## Overview 
@@ -64,22 +84,6 @@ The system uses **five (5) groundbreaking mathematical developments**:
 4. **Contrastive Learning** - MoCo (Momentum Contrast) with hard negative mining for robust boundary detection
 
 5. **Siamese Neural Networks** - Learns to predict bridge success from historical interaction data with attention mechanisms
-
----
-
-## Accolades 
-
-<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
-
-<img src="images/manus-ai.png" width="10%" />
-
-Open Presentation: Manus AI
-
-Panel
-
--   Lyman, Parker
--   Tan, Michelle
--   Li, Lantao
 
 ---
 
