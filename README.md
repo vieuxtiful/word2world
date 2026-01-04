@@ -8,7 +8,7 @@ Funded by:
 
 <img src="images/middlebury-seal.png" width="10%" /> <img src="images/middlebury-institute-seal.png" width="9%" hspace="40" /> <img src="images/p4p-logo.png" width="30%" hspace="3" />
 
-The *Kathryn W. Davis Projects for Peace* in partnership with the Middlebury Institute.
+The *Kathryn W. Davis Projects for Peace* (in partnership with the Middlebury Institute).
 
 Funding: $10,000
 
