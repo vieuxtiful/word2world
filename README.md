@@ -26,7 +26,7 @@ Middlebury Institute of International Studies at Monterey (MIIS)
 
 ---
 
-## Overview
+<img src="images/Digital Logo (v2).svg" width="10%" /> ## Overview
 
 **Word2World** is a next-generation platform that leverages advanced mathematical frameworks to bridge ideological divides and foster constructive dialogue. 
 
