@@ -30,19 +30,21 @@ Middlebury Institute of International Studies at Monterey (MIIS)
 
 <img src="images/metaxmanus-ai-2.png" width="55%" />
 
-Invitation: Open Presentation with Manus AI (Meta)
+Invitation: Manus AI - Open Presentation
 
 Date: September 22, 2025
 
-Presentation Panel:
+Purpose: The Manus AI team met with Team Word2World's Technical Lead to discuss in a special interview focused on the advent of general AI agents. During the interview, the innovative mathematical foundation of Word2World was presented, including references to the draft Technical Paper on STAP v4.0.  
+
+Manus AI Panel:
 
 -   Lyman, Parker (Chief of Staff)
 -   Li, Lantao (GTM)
 -   Tan, Michelle 
 
-Presenter: 
+Team Word2World Panel: 
 
-Valcin, Vieux (Technical Lead)
+-   Valcin, Vieux (Technical Lead)
 
 ---
 
