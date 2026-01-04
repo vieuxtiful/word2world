@@ -28,7 +28,7 @@ Middlebury Institute of International Studies at Monterey (MIIS)
 
 <img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
-<img src="images/metaxmanus-ai.png" width="30%" />
+<img src="images/metaxmanus-ai-2.png" width="55%" />
 
 Invitation: Open Presentation with Manus AI (Meta)
 
