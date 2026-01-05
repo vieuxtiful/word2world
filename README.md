@@ -78,6 +78,10 @@ Bridge: Users with moderate likelihood of socioideological alignment
 
 Horizons: Users with lowest likelihood of socioideological alignment
 
+<img src="images/leaderboard-viz.png" width="35%" />
+
+🕊 Leaderboards 🕊
+
 ### What Makes STAP v4.0 Unique?
 
 Unlike traditional recommendation systems that create echo chambers (e.g., Facebook AI similarity search, faiss), our native STAP v4.0 architecture actively identifies and promotes content that:
