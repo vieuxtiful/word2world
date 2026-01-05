@@ -66,21 +66,27 @@ It is a platform designed from the ground up for peace-building, not engagement.
 
 ## Experience
 
+**>> Neighbor**
+
 <img src="images/neighbor-viz.gif" width="35%" /> 
 
-Neighbor: Users with highest likelihood of socioideological alignment
+Users with highest likelihood of socioideological alignment
+
+**>> Bridge**
 
 <img src="images/bridge-viz.gif" width="35%" /> 
 
-Bridge: Users with moderate likelihood of socioideological alignment
+Users with moderate likelihood of socioideological alignment
+
+**>> Horizons**
 
 <img src="images/horizons-viz.png" width="35%" /> 
 
-Horizons: Users with lowest likelihood of socioideological alignment
+Users with lowest likelihood of socioideological alignment
 
 <img src="images/leaderboard-viz.png" width="35%" />
 
-🕊 Leaderboards 🕊
+Leaderboards 🕊
 
 ### What Makes STAP v4.0 Unique?
 
