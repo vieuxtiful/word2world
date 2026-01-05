@@ -1,4 +1,8 @@
+<div align="center">
+
 <img src="images/w2w-digital-logo-new.gif" width="85%" />
+
+</div>
 
 # Word2World: **Bridging Ideas Together**
 
@@ -617,6 +621,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
+
 - **Project Website:** [Coming Soon]
 - **Email:** Valcin, Vieux - Technical Lead, Full-Stack [vvalcin@middlebury.edu]
 - **Authors:**
@@ -633,6 +639,8 @@ Middlebury Institute of International Studies at Monterey (MIIS)
 ---
 
 ## Acknowledgments
+
+<img src="images/glassmorphism-dove.svg" width="10%" align="right" />
 
 - **Kathryn W. Davis Projects for Peace Committee** - Funding opportunity through the Davis Projects for Peace program
 - **Middlebury Institute of International Studies** - Institutional support and resources
