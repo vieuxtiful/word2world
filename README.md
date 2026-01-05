@@ -64,6 +64,20 @@ Most responses to this crisis are reactive—better content moderation, fact-che
 
 It is a platform designed from the ground up for peace-building, not engagement. 
 
+## Experience
+
+<img src="images/neighbor-viz.gif" width="35%" /> 
+
+Neighbor: Users with highest likelihood of socioideological alignment
+
+<img src="images/bridge-viz.gif" width="35%" /> 
+
+Bridge: Users with moderate likelihood of socioideological alignment
+
+<img src="images/horizons-viz.gif" width="35%" /> 
+
+Horizons: Users with lowest likelihood of socioideological alignment
+
 ### What Makes STAP v4.0 Unique?
 
 Unlike traditional recommendation systems that create echo chambers (e.g., Facebook AI similarity search, faiss), our native STAP v4.0 architecture actively identifies and promotes content that:
