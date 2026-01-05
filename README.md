@@ -66,13 +66,13 @@ It is a platform designed from the ground up for peace-building, not engagement.
 
 ## Experience
 
-**>> Neighbor**
+**>> Neighbors**
 
 <img src="images/neighbor-viz.gif" width="35%" /> 
 
 Users with highest likelihood of socioideological alignment
 
-**>> Bridge**
+**>> Bridges**
 
 <img src="images/bridge-viz.gif" width="35%" /> 
 
@@ -91,9 +91,9 @@ Leaderboards 🕊
 ### What Makes STAP v4.0 Unique?
 
 Unlike traditional recommendation systems that create echo chambers (e.g., Facebook AI similarity search, faiss), our native STAP v4.0 architecture actively identifies and promotes content that:
-- **Validates** your existing views (Neighbors)
-- **Expands** your perspective with related but different ideas (Bridges)
-- **Challenges** you with distant viewpoints (Horizons)
+- **Validates** existing views (i.e., Neighbors)
+- **Expands** perspectives with related but different ideas (i.e., Bridges)
+- **Challenges** with distant viewpoints (i.e., Horizons)
 
 The system uses **five (5) groundbreaking mathematical developments**:
 
