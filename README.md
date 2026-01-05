@@ -8,22 +8,11 @@ Funded by:
 
 <img src="images/middlebury-seal.png" width="8%" /> <img src="images/middlebury-institute-seal.png" width="7%" hspace="40" /> <img src="images/p4p-logo.png" width="20%" hspace="3" />
 
-The *Kathryn W. Davis Projects for Peace* (in partnership with the Middlebury Institute).
+The *Kathryn W. Davis Projects for Peace* (in partnership with the Middlebury Institute)
 
-Funding: $10,000
+Funding Amount: $XX,XXX
 
 --------------------------------------------------------- 
-
-**Authors:**
--   Valcin, Vieux (Technical Lead)
--   Bai, Shu
--   Chen, Jinxing
--   Cao, Xiaoyue
--   Dai, Yunzhou
--   Zhang, Huiyi  
-
-Translation and Localization Management (TLM) students at the
-Middlebury Institute of International Studies at Monterey (MIIS)
 
 ## Accolades 
 
@@ -630,6 +619,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Project Website:** [Coming Soon]
 - **Email:** Valcin, Vieux - Technical Lead, Full-Stack [vvalcin@middlebury.edu]
+- **Authors:**
+-   Valcin, Vieux (Technical Lead)
+-   Bai, Shu
+-   Chen, Jinxing
+-   Cao, Xiaoyue
+-   Dai, Yunzhou
+-   Zhang, Huiyi  
+
+Translation and Localization Management (TLM) students at the
+Middlebury Institute of International Studies at Monterey (MIIS)
 
 ---
 
