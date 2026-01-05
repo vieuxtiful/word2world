@@ -74,7 +74,7 @@ Neighbor: Users with highest likelihood of socioideological alignment
 
 Bridge: Users with moderate likelihood of socioideological alignment
 
-<img src="images/horizons-viz.gif" width="35%" /> 
+<img src="images/horizons-viz.png" width="35%" /> 
 
 Horizons: Users with lowest likelihood of socioideological alignment
 
